@@ -3,11 +3,16 @@
     "apps": [],
     "details": [
       {
-        "appID": "CPL7H8SHVM.net.yumnumm.eqmonitor",
+        "appIDs": "CPL7H8SHVM.net.yumnumm.eqmonitor",
         "paths": [
           "*"
         ]
       }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "CPL7H8SHVM.net.yumnumm.eqmonitor"
     ]
   }
 }
