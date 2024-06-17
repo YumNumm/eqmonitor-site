@@ -10,7 +10,7 @@ interface Props {
 const { title, description } = Astro.props;
 ---
 
-<html lang="ja">
+<html lang="ja" class="h-full">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -30,9 +30,11 @@ const { title, description } = Astro.props;
     />
     <title>{title}</title>
   </head>
-  <body>
+  <body class="h-full">
     <Navbar />
     <slot />
-    <Footer />
+    <div class="sticky top-[100vh]" style="top: 100dvh;">
+      <Footer />
+    </div>
   </body>
 </html>
