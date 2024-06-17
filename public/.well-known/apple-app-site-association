@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appIDs": "CPL7H8SHVM.net.yumnumm.eqmonitor",
+        "appIDs": ["CPL7H8SHVM.net.yumnumm.eqmonitor"],
         "paths": [
           "*"
         ]
