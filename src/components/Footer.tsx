@@ -22,6 +22,11 @@ export function Footer() {
           </Link>
         </li>
         <li>
+          <Link to="/guideline" className="hover:underline me-4 md:me-6">
+            ガイドライン対応状況
+          </Link>
+        </li>
+        <li>
           <Link to="/contact" className="hover:underline">
             お問い合わせ
           </Link>
