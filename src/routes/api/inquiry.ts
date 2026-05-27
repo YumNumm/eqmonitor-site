@@ -2,9 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import * as v from 'valibot'
 import { appEnv } from '~/server/env'
 import { verifyTurnstile } from '~/server/turnstile'
-import { checkRateLimit, hashIp } from '~/server/ratelimit'
-import { getInquiry, insertInquiry, setSlackMessageTs } from '~/server/db'
-import { postInquiryMessage } from '~/server/slack'
+import { getInquiry, insertInquiry, markIssueCreated } from '~/server/db'
+import { createIssue } from '~/server/github'
 
 const InquirySchema = v.object({
   token: v.pipe(v.string(), v.minLength(1, 'Turnstile token が必要です')),
@@ -56,20 +55,7 @@ export const Route = createFileRoute('/api/inquiry')({
           return json({ error: 'turnstile_failed' }, 400)
         }
 
-        const ipHash = await hashIp(ip, appEnv.IP_HASH_SALT)
-
-        // 2. レート制限 (1時間あたり5件)
-        const allowed = await checkRateLimit({
-          kv: appEnv.RATE_LIMIT_KV,
-          identifier: ipHash,
-          limit: 5,
-          windowSec: 60 * 60,
-        })
-        if (!allowed) {
-          return json({ error: 'rate_limited' }, 429)
-        }
-
-        // 3. D1 へ先に確定保存
+        // 2. D1 へ先に確定保存
         const id = crypto.randomUUID()
         await insertInquiry(appEnv.DB, {
           id,
@@ -80,24 +66,22 @@ export const Route = createFileRoute('/api/inquiry')({
           app_version: parsed.app_version ?? null,
           platform: parsed.platform ?? null,
           user_agent: request.headers.get('user-agent'),
-          ip_hash: ipHash,
         })
 
-        // 4. Slack 通知 (失敗しても問い合わせは保存済みなので 200 を返す)
+        // 3. GitHub Issue 作成 (失敗しても問い合わせは保存済みなので 200 を返す)
         try {
           const inquiry = await getInquiry(appEnv.DB, id)
-          if (inquiry && appEnv.SLACK_BOT_TOKEN && appEnv.SLACK_CHANNEL_ID) {
-            const ts = await postInquiryMessage({
-              botToken: appEnv.SLACK_BOT_TOKEN,
-              channel: appEnv.SLACK_CHANNEL_ID,
+          if (inquiry && appEnv.GITHUB_TOKEN) {
+            const issueNumber = await createIssue({
+              token: appEnv.GITHUB_TOKEN,
+              owner: appEnv.GITHUB_OWNER,
+              repo: appEnv.GITHUB_REPO,
               inquiry,
             })
-            if (ts) {
-              await setSlackMessageTs(appEnv.DB, id, ts)
-            }
+            await markIssueCreated(appEnv.DB, id, issueNumber)
           }
         } catch (e) {
-          console.error('Slack 通知に失敗', e)
+          console.error('GitHub Issue 作成に失敗', e)
         }
 
         return json({ ok: true, id })

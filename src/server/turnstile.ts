@@ -1,12 +1,14 @@
+import * as v from 'valibot'
+
 const SITEVERIFY_URL =
   'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
-interface SiteverifyResponse {
-  success: boolean
-  'error-codes'?: string[]
-  challenge_ts?: string
-  hostname?: string
-}
+const SiteverifyResponseSchema = v.object({
+  success: v.boolean(),
+  'error-codes': v.optional(v.array(v.string())),
+  challenge_ts: v.optional(v.string()),
+  hostname: v.optional(v.string()),
+})
 
 /**
  * Turnstile token をサーバー側で検証する。
@@ -28,6 +30,7 @@ export async function verifyTurnstile(params: {
   if (!res.ok) {
     return false
   }
-  const data = (await res.json()) as SiteverifyResponse
-  return data.success === true
+  // 想定外のレスポンス形状は検証失敗として扱う
+  const result = v.safeParse(SiteverifyResponseSchema, await res.json())
+  return result.success && result.output.success === true
 }

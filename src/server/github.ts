@@ -1,9 +1,60 @@
+import * as v from 'valibot'
 import type { Inquiry, InquiryType } from './db'
+
+const CreateIssueResponseSchema = v.object({
+  number: v.number(),
+})
 
 const TYPE_LABEL: Record<InquiryType, string> = {
   inquiry: '問い合わせ',
   feedback: 'フィードバック',
   bug: 'バグ報告',
+}
+
+/** Issue に付与するラベル定義 (repo に無ければ作成する)。 */
+const LABEL_DEFINITION: Record<
+  InquiryType,
+  { name: string; color: string; description: string }
+> = {
+  inquiry: { name: 'inquiry', color: '0075ca', description: '問い合わせ' },
+  feedback: { name: 'feedback', color: 'a2eeef', description: 'フィードバック' },
+  bug: { name: 'bug', color: 'd73a4a', description: 'バグ報告' },
+}
+
+function githubHeaders(token: string): HeadersInit {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'eqmonitor-site',
+    'Content-Type': 'application/json',
+  }
+}
+
+/**
+ * ラベルが repo に存在することを保証する (冪等)。
+ * 既に存在する場合は 422 (already_exists) が返るので無視する。
+ * @see https://docs.github.com/en/rest/issues/labels#create-a-label
+ */
+async function ensureLabel(params: {
+  token: string
+  owner: string
+  repo: string
+  label: { name: string; color: string; description: string }
+}): Promise<void> {
+  const { token, owner, repo, label } = params
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/labels`,
+    {
+      method: 'POST',
+      headers: githubHeaders(token),
+      body: JSON.stringify(label),
+    },
+  )
+  if (!res.ok && res.status !== 422) {
+    const text = await res.text()
+    throw new Error(`GitHub ラベル作成に失敗: ${res.status} ${text}`)
+  }
 }
 
 /**
@@ -34,29 +85,24 @@ export async function createIssue(params: {
     .filter((line) => line !== null)
     .join('\n')
 
-  const url = `https://api.github.com/repos/${owner}/${repo}/issues`
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'eqmonitor-site',
-    'Content-Type': 'application/json',
-  }
+  // ラベルが無いと issue 作成時に 422 になるため、先に存在を保証してから付与する
+  const label = LABEL_DEFINITION[inquiry.type]
+  await ensureLabel({ token, owner, repo, label })
 
-  const post = (payload: Record<string, unknown>) =>
-    fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) })
-
-  // ラベルが repo に存在しないと 422 になるため、その場合はラベルなしで再試行する
-  let res = await post({ title, body, labels: [inquiry.type] })
-  if (res.status === 422) {
-    res = await post({ title, body })
-  }
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues`,
+    {
+      method: 'POST',
+      headers: githubHeaders(token),
+      body: JSON.stringify({ title, body, labels: [label.name] }),
+    },
+  )
 
   if (!res.ok) {
     const text = await res.text()
     throw new Error(`GitHub Issue 作成に失敗: ${res.status} ${text}`)
   }
 
-  const data = (await res.json()) as { number: number }
+  const data = v.parse(CreateIssueResponseSchema, await res.json())
   return data.number
 }

@@ -1,4 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import * as v from 'valibot'
+
+const InquiryErrorSchema = v.object({
+  error: v.optional(v.string()),
+})
 
 // Turnstile の最小型定義 (explicit rendering)
 declare global {
@@ -95,12 +100,12 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
         setMessage('')
         setEmail('')
       } else {
-        const data = (await res.json().catch(() => ({}))) as {
-          error?: string
-        }
+        const raw = await res.json().catch(() => ({}))
+        const parsed = v.safeParse(InquiryErrorSchema, raw)
+        const error = parsed.success ? parsed.output.error : undefined
         setErrorMsg(
-          data.error === 'rate_limited'
-            ? '送信回数の上限に達しました。しばらく経ってから再度お試しください。'
+          error === 'turnstile_failed'
+            ? '認証に失敗しました。もう一度お試しください。'
             : '送信に失敗しました。時間をおいて再度お試しください。',
         )
         setStatus('error')

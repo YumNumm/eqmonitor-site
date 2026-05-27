@@ -12,8 +12,6 @@
 	"vars": {
 		// Cloudflare Turnstile の site key (public)。ランタイムで loader 経由フォームへ注入。
 		"TURNSTILE_SITE_KEY": "0x4AAAAAADXHIKnSew1W7HAw",
-		// 通知先 Slack チャンネル ID (例: C0123456789)
-		"SLACK_CHANNEL_ID": "",
 		"GITHUB_OWNER": "YumNumm",
 		"GITHUB_REPO": "eqmonitor-backend"
 	},

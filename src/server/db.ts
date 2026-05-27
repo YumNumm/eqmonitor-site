@@ -1,5 +1,5 @@
 export type InquiryType = 'inquiry' | 'feedback' | 'bug'
-export type InquiryStatus = 'new' | 'issue_created' | 'dismissed'
+export type InquiryStatus = 'new' | 'issue_created'
 
 export interface Inquiry {
   id: string
@@ -10,16 +10,11 @@ export interface Inquiry {
   app_version: string | null
   platform: string | null
   user_agent: string | null
-  ip_hash: string | null
   status: InquiryStatus
-  slack_message_ts: string | null
   github_issue_number: number | null
 }
 
-export type NewInquiry = Omit<
-  Inquiry,
-  'status' | 'slack_message_ts' | 'github_issue_number'
->
+export type NewInquiry = Omit<Inquiry, 'status' | 'github_issue_number'>
 
 export async function insertInquiry(
   db: D1Database,
@@ -28,8 +23,8 @@ export async function insertInquiry(
   await db
     .prepare(
       `INSERT INTO inquiries
-        (id, created_at, type, email, message, app_version, platform, user_agent, ip_hash, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')`,
+        (id, created_at, type, email, message, app_version, platform, user_agent, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new')`,
     )
     .bind(
       inquiry.id,
@@ -40,7 +35,6 @@ export async function insertInquiry(
       inquiry.app_version,
       inquiry.platform,
       inquiry.user_agent,
-      inquiry.ip_hash,
     )
     .run()
 }
@@ -55,17 +49,6 @@ export async function getInquiry(
     .first<Inquiry>()
 }
 
-export async function setSlackMessageTs(
-  db: D1Database,
-  id: string,
-  ts: string,
-): Promise<void> {
-  await db
-    .prepare('UPDATE inquiries SET slack_message_ts = ? WHERE id = ?')
-    .bind(ts, id)
-    .run()
-}
-
 export async function markIssueCreated(
   db: D1Database,
   id: string,
@@ -76,15 +59,5 @@ export async function markIssueCreated(
       `UPDATE inquiries SET status = 'issue_created', github_issue_number = ? WHERE id = ?`,
     )
     .bind(issueNumber, id)
-    .run()
-}
-
-export async function markDismissed(
-  db: D1Database,
-  id: string,
-): Promise<void> {
-  await db
-    .prepare(`UPDATE inquiries SET status = 'dismissed' WHERE id = ?`)
-    .bind(id)
     .run()
 }
