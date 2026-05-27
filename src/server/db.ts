@@ -5,7 +5,9 @@ export interface Inquiry {
   id: string
   created_at: string
   type: InquiryType
-  email: string | null
+  name: string
+  email: string
+  subject: string
   message: string
   app_version: string | null
   platform: string | null
@@ -23,14 +25,16 @@ export async function insertInquiry(
   await db
     .prepare(
       `INSERT INTO inquiries
-        (id, created_at, type, email, message, app_version, platform, user_agent, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new')`,
+        (id, created_at, type, name, email, subject, message, app_version, platform, user_agent, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')`,
     )
     .bind(
       inquiry.id,
       inquiry.created_at,
       inquiry.type,
+      inquiry.name,
       inquiry.email,
+      inquiry.subject,
       inquiry.message,
       inquiry.app_version,
       inquiry.platform,

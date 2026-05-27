@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import * as v from 'valibot'
+import { ContactFormSchema } from '~/lib/inquirySchema'
 
 const InquiryErrorSchema = v.object({
   error: v.optional(v.string()),
@@ -35,8 +37,10 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
   const widgetIdRef = useRef<string | null>(null)
   const [token, setToken] = useState('')
   const [type, setType] = useState<'inquiry' | 'feedback' | 'bug'>('inquiry')
-  const [message, setMessage] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -87,18 +91,35 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
       setStatus('error')
       return
     }
+
+    // 送信前にクライアント側でも valibot で検証する
+    const validated = v.safeParse(ContactFormSchema, {
+      type,
+      name,
+      email,
+      subject,
+      message,
+    })
+    if (!validated.success) {
+      setErrorMsg(validated.issues[0].message)
+      setStatus('error')
+      return
+    }
+
     setStatus('submitting')
     setErrorMsg('')
     try {
       const res = await fetch('/api/inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, type, message, email }),
+        body: JSON.stringify({ token, ...validated.output }),
       })
       if (res.ok) {
         setStatus('success')
-        setMessage('')
+        setName('')
         setEmail('')
+        setSubject('')
+        setMessage('')
       } else {
         const raw = await res.json().catch(() => ({}))
         const parsed = v.safeParse(InquiryErrorSchema, raw)
@@ -150,15 +171,40 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
       </label>
 
       <label className="form-control w-full">
-        <span className="label-text mb-1">
-          メールアドレス（任意・返信が必要な場合）
-        </span>
+        <span className="label-text mb-1">お名前</span>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          maxLength={100}
+          placeholder="山田 太郎"
+        />
+      </label>
+
+      <label className="form-control w-full">
+        <span className="label-text mb-1">メールアドレス</span>
         <input
           type="email"
           className="input input-bordered w-full"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
           placeholder="you@example.com"
+        />
+      </label>
+
+      <label className="form-control w-full">
+        <span className="label-text mb-1">件名</span>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          required
+          maxLength={200}
+          placeholder="お問い合わせの件名"
         />
       </label>
 
@@ -182,12 +228,29 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
         </div>
       )}
 
+      <p className="text-sm text-base-content/70">
+        送信することで
+        <Link to="/privacy_policy" className="link link-primary">
+          プライバシーポリシー
+        </Link>
+        に同意したものとみなします。
+      </p>
+
       <button
         type="submit"
         className="btn btn-primary"
-        disabled={status === 'submitting' || !message.trim() || !token}
+        disabled={
+          status === 'submitting' ||
+          !name.trim() ||
+          !email.trim() ||
+          !subject.trim() ||
+          !message.trim() ||
+          !token
+        }
       >
-        {status === 'submitting' ? '送信中…' : '送信する'}
+        {status === 'submitting'
+          ? '送信中…'
+          : 'プライバシーポリシーに同意して送信する'}
       </button>
     </form>
   )

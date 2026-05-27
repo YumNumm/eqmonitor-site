@@ -30,6 +30,12 @@ function Contact() {
       <p className="text-center text-base-content/70 mb-8">
         ご意見・ご要望・不具合のご報告をお寄せください。
       </p>
+      <div className="alert alert-info max-w-xl mx-auto mb-8">
+        <span>
+          いただいたお問い合わせには、基本的に個別の返信は行っておりません。
+          ただし、内容はすべて開発者が拝見し、今後の改善の参考にさせていただいています。
+        </span>
+      </div>
       <ContactForm siteKey={siteKey} />
     </div>
   )

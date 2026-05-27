@@ -4,22 +4,11 @@ import { appEnv } from '~/server/env'
 import { verifyTurnstile } from '~/server/turnstile'
 import { getInquiry, insertInquiry, markIssueCreated } from '~/server/db'
 import { createIssue } from '~/server/github'
+import { ContactFormSchema } from '~/lib/inquirySchema'
 
 const InquirySchema = v.object({
+  ...ContactFormSchema.entries,
   token: v.pipe(v.string(), v.minLength(1, 'Turnstile token が必要です')),
-  type: v.picklist(['inquiry', 'feedback', 'bug']),
-  message: v.pipe(
-    v.string(),
-    v.trim(),
-    v.minLength(1, '本文を入力してください'),
-    v.maxLength(5000, '本文が長すぎます'),
-  ),
-  email: v.optional(
-    v.union([
-      v.pipe(v.string(), v.email('メールアドレスの形式が不正です')),
-      v.literal(''),
-    ]),
-  ),
   app_version: v.optional(v.pipe(v.string(), v.maxLength(50))),
   platform: v.optional(v.pipe(v.string(), v.maxLength(50))),
 })
@@ -61,7 +50,9 @@ export const Route = createFileRoute('/api/inquiry')({
           id,
           created_at: new Date().toISOString(),
           type: parsed.type,
-          email: parsed.email ? parsed.email : null,
+          name: parsed.name,
+          email: parsed.email,
+          subject: parsed.subject,
           message: parsed.message,
           app_version: parsed.app_version ?? null,
           platform: parsed.platform ?? null,

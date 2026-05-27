@@ -69,15 +69,16 @@ export async function createIssue(params: {
 }): Promise<number> {
   const { token, owner, repo, inquiry } = params
 
-  const title = `[${TYPE_LABEL[inquiry.type]}] ${inquiry.message.slice(0, 60)}`
+  const title = `[${TYPE_LABEL[inquiry.type]}] ${inquiry.subject}`
   const body = [
-    `## ${TYPE_LABEL[inquiry.type]}`,
+    `## ${inquiry.subject}`,
     '',
     inquiry.message,
     '',
     '---',
     `- 受信日時: ${inquiry.created_at}`,
-    inquiry.email ? `- 連絡先: ${inquiry.email}` : '- 連絡先: (なし)',
+    `- お名前: ${inquiry.name}`,
+    `- 連絡先: ${inquiry.email}`,
     inquiry.platform ? `- Platform: ${inquiry.platform}` : null,
     inquiry.app_version ? `- App version: ${inquiry.app_version}` : null,
     `- Inquiry ID: ${inquiry.id}`,
