@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: night --default;
+}
+@plugin "@tailwindcss/typography";
+
+html,
+body {
+  height: 100%;
+}
+
+/* Hero のキャッチコピーを文節単位で折り返す */
+.span-break span {
+  display: inline-block;
+}

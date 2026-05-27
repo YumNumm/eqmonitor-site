@@ -1,0 +1,107 @@
+import { createFileRoute } from '@tanstack/react-router'
+import * as v from 'valibot'
+import { appEnv } from '~/server/env'
+import { verifyTurnstile } from '~/server/turnstile'
+import { checkRateLimit, hashIp } from '~/server/ratelimit'
+import { getInquiry, insertInquiry, setSlackMessageTs } from '~/server/db'
+import { postInquiryMessage } from '~/server/slack'
+
+const InquirySchema = v.object({
+  token: v.pipe(v.string(), v.minLength(1, 'Turnstile token が必要です')),
+  type: v.picklist(['inquiry', 'feedback', 'bug']),
+  message: v.pipe(
+    v.string(),
+    v.trim(),
+    v.minLength(1, '本文を入力してください'),
+    v.maxLength(5000, '本文が長すぎます'),
+  ),
+  email: v.optional(
+    v.union([
+      v.pipe(v.string(), v.email('メールアドレスの形式が不正です')),
+      v.literal(''),
+    ]),
+  ),
+  app_version: v.optional(v.pipe(v.string(), v.maxLength(50))),
+  platform: v.optional(v.pipe(v.string(), v.maxLength(50))),
+})
+
+function json(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export const Route = createFileRoute('/api/inquiry')({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        let parsed: v.InferOutput<typeof InquirySchema>
+        try {
+          const raw = await request.json()
+          parsed = v.parse(InquirySchema, raw)
+        } catch {
+          return json({ error: 'invalid_request' }, 400)
+        }
+
+        const ip = request.headers.get('cf-connecting-ip') ?? 'unknown'
+
+        // 1. Turnstile 検証
+        const ok = await verifyTurnstile({
+          secretKey: appEnv.TURNSTILE_SECRET_KEY,
+          token: parsed.token,
+          remoteip: ip !== 'unknown' ? ip : undefined,
+        })
+        if (!ok) {
+          return json({ error: 'turnstile_failed' }, 400)
+        }
+
+        const ipHash = await hashIp(ip, appEnv.IP_HASH_SALT)
+
+        // 2. レート制限 (1時間あたり5件)
+        const allowed = await checkRateLimit({
+          kv: appEnv.RATE_LIMIT_KV,
+          identifier: ipHash,
+          limit: 5,
+          windowSec: 60 * 60,
+        })
+        if (!allowed) {
+          return json({ error: 'rate_limited' }, 429)
+        }
+
+        // 3. D1 へ先に確定保存
+        const id = crypto.randomUUID()
+        await insertInquiry(appEnv.DB, {
+          id,
+          created_at: new Date().toISOString(),
+          type: parsed.type,
+          email: parsed.email ? parsed.email : null,
+          message: parsed.message,
+          app_version: parsed.app_version ?? null,
+          platform: parsed.platform ?? null,
+          user_agent: request.headers.get('user-agent'),
+          ip_hash: ipHash,
+        })
+
+        // 4. Slack 通知 (失敗しても問い合わせは保存済みなので 200 を返す)
+        try {
+          const inquiry = await getInquiry(appEnv.DB, id)
+          if (inquiry && appEnv.SLACK_BOT_TOKEN && appEnv.SLACK_CHANNEL_ID) {
+            const ts = await postInquiryMessage({
+              botToken: appEnv.SLACK_BOT_TOKEN,
+              channel: appEnv.SLACK_CHANNEL_ID,
+              inquiry,
+            })
+            if (ts) {
+              await setSlackMessageTs(appEnv.DB, id, ts)
+            }
+          }
+        } catch (e) {
+          console.error('Slack 通知に失敗', e)
+        }
+
+        return json({ ok: true, id })
+      },
+    },
+  },
+})

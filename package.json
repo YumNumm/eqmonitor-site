@@ -1,27 +1,41 @@
 {
   "name": "eqmonitor-site",
+  "private": true,
+  "sideEffects": false,
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "vite dev",
+    "build": "vite build && tsc --noEmit",
+    "preview": "vite preview",
+    "deploy": "pnpm run build && wrangler deploy",
+    "cf-typegen": "wrangler types",
+    "postinstall": "wrangler types",
+    "db:migrate:local": "wrangler d1 migrations apply eqmonitor-site-inquiries --local",
+    "db:migrate:remote": "wrangler d1 migrations apply eqmonitor-site-inquiries --remote"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.9",
-    "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.3.2",
-    "astro-heroicons": "^2.1.5",
-    "daisyui": "^5.5.19",
-    "sharp": "^0.34.5",
-    "tailwindcss": "^4.3.0",
-    "typescript": "^6.0.3"
+    "@heroicons/react": "^2.2.0",
+    "@tanstack/react-router": "^1.170.8",
+    "@tanstack/react-router-devtools": "^1.167.0",
+    "@tanstack/react-start": "^1.168.14",
+    "marked": "^16.4.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "valibot": "^1.1.0"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.39.0",
     "@tailwindcss/typography": "^0.5.19",
-    "@types/node": "^25.7.0",
-    "wrangler": "^4.90.1"
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^22.5.4",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "daisyui": "^5.5.19",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14",
+    "wrangler": "^4.95.0"
   }
 }
