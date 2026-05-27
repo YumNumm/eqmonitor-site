@@ -1,12 +1,38 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: night --default;
+  themes: false;
 }
 @plugin "@tailwindcss/typography";
+
+@plugin "daisyui/theme" {
+  name: "eqmonitor";
+  default: true;
+  color-scheme: dark;
+
+  --color-base-100: #0c0f1a;
+  --color-base-200: #141826;
+  --color-base-300: #1f2436;
+  --color-base-content: #f8f7fd;
+
+  --color-primary: #1313bc;
+  --color-primary-content: #f8f7fd;
+  --color-secondary: #c9cbf0;
+  --color-secondary-content: #1313bc;
+  --color-accent: #c9cbf0;
+  --color-accent-content: #1313bc;
+
+  --color-neutral: #1f2436;
+  --color-neutral-content: #d9d8d6;
+}
+
+@theme {
+  --font-sans: "Google Sans Flex", "Noto Sans JP", sans-serif;
+}
 
 html,
 body {
   height: 100%;
+  font-family: var(--font-sans);
 }
 
 /* Hero のキャッチコピーを文節単位で折り返す */
