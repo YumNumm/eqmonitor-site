@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eqmonitor-beta-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-09-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "eqmonitor-site-inquiries",
+      "database_id": "d98dba26-a8c3-4f4a-8b89-66ffc07c1901"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "beta-registration-workflow",
+      "binding": "BETA_WORKFLOW",
+      "class_name": "BetaRegistrationWorkflow"
+    }
+  ]
+}
