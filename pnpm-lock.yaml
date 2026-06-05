@@ -56,6 +56,9 @@ importers:
       eqmonitor-beta-worker:
         specifier: workspace:*
         version: link:workers/beta-worker
+      hono:
+        specifier: ^4.12.23
+        version: 4.12.23
       jose:
         specifier: ^6.2.3
         version: 6.2.3
