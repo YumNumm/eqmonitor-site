@@ -20,5 +20,6 @@
       "binding": "BETA_WORKFLOW",
       "class_name": "BetaRegistrationWorkflow"
     }
-  ]
+  ],
+  "workers_dev": false
 }

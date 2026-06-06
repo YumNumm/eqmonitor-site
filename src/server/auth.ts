@@ -1,10 +1,15 @@
 import { betterAuth } from 'better-auth'
+import { withCloudflare } from 'better-auth-cloudflare'
+import { dash, sentinel } from '@better-auth/infra'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 import { importPKCS8, SignJWT } from 'jose'
 import type { AppEnv } from './env'
 
 async function generateAppleClientSecret(env: AppEnv): Promise<string> {
-  const key = await importPKCS8(env.APPLE_PRIVATE_KEY, 'ES256')
+  const pem = new TextDecoder().decode(
+    Uint8Array.from(atob(env.APPLE_PRIVATE_KEY), (c) => c.charCodeAt(0)),
+  )
+  const key = await importPKCS8(pem, 'ES256')
   const now = Math.floor(Date.now() / 1000)
   return new SignJWT({})
     .setProtectedHeader({ alg: 'ES256', kid: env.APPLE_KEY_ID })
@@ -16,7 +21,6 @@ async function generateAppleClientSecret(env: AppEnv): Promise<string> {
     .sign(key)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let cachedAuth: any = null
 let cachedSecretExpiry = 0
 
@@ -26,17 +30,39 @@ export async function getAuth(env: AppEnv): Promise<ReturnType<typeof betterAuth
 
   const clientSecret = await generateAppleClientSecret(env)
 
-  cachedAuth = betterAuth({
-    database: env.DB,
-    trustedOrigins: ['https://appleid.apple.com'],
-    socialProviders: {
-      apple: {
-        clientId: env.APPLE_CLIENT_ID,
-        clientSecret,
+  cachedAuth = betterAuth(
+    withCloudflare(
+      {
+        d1Native: env.DB,
+        autoDetectIpAddress: false,
+        geolocationTracking: false,
       },
-    },
-    plugins: [tanstackStartCookies()],
-  })
+      {
+        trustedOrigins: ['https://appleid.apple.com', 'https://eqmonitor.app'],
+        socialProviders: {
+          apple: {
+            clientId: env.APPLE_CLIENT_ID,
+            clientSecret,
+          },
+        },
+        plugins: [
+          tanstackStartCookies(),
+          dash({}),
+          sentinel({
+            security: {
+              credentialStuffing: {
+                enabled: true,
+              },
+            },
+          }),
+        ],
+        logger: {
+          level: 'info',
+          disableColors: true,
+        },
+      },
+    ),
+  )
 
   cachedSecretExpiry = now + 90 * 24 * 60 * 60 * 1000
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import * as v from 'valibot'
 import { authClient } from '~/server/auth-client'
 import { BetaRegistrationFormSchema } from '~/lib/betaSchema'
+import { registerBeta } from '~/server/beta-register'
 import { BetaTermsModal } from './BetaTermsModal'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
@@ -26,8 +27,7 @@ function BetaFormInner() {
     return (
       <div className="max-w-md mx-auto">
         <p className="text-base-content/70 mb-6 text-center">
-          ベータプログラムに参加するには、Apple
-          アカウントでサインインしてください。
+          ベータプログラムに参加するには、Apple Accountでサインインしてください。
         </p>
         <button
           type="button"
@@ -72,21 +72,15 @@ function BetaFormInner() {
     setStatus('submitting')
     setErrorMsg('')
     try {
-      const res = await fetch('/api/beta/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ platform: 'ios', email }),
-      })
-      if (res.ok) {
+      const result = await registerBeta({ data: { platform: 'ios', email } })
+      if (result.ok) {
         setStatus('success')
         setShowModal(false)
       } else {
-        const data = await res.json().catch(() => ({}))
-        const error = (data as { error?: string }).error
-        if (error === 'already_registered') {
+        if (result.error === 'already_registered') {
           setErrorMsg('既にベータプログラムに登録されています。')
         } else {
-          setErrorMsg('登録に失敗しました。時間をおいて再度お試しください。')
+          setErrorMsg('登録に失敗しました。時間をおいて再度お試しください。: ' + result.error)
         }
         setStatus('error')
         setShowModal(false)

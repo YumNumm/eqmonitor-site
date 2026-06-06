@@ -11,7 +11,6 @@ const TYPE_LABEL: Record<InquiryType, string> = {
   bug: 'バグ報告',
 }
 
-/** Issue に付与するラベル定義 (repo に無ければ作成する)。 */
 const LABEL_DEFINITION: Record<
   InquiryType,
   { name: string; color: string; description: string }
@@ -32,7 +31,7 @@ function githubHeaders(token: string): HeadersInit {
 }
 
 /**
- * ラベルが repo に存在することを保証する (冪等)。
+ * ラベルが repo に存在することを保証する 
  * 既に存在する場合は 422 (already_exists) が返るので無視する。
  * @see https://docs.github.com/en/rest/issues/labels#create-a-label
  */

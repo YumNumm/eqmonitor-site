@@ -18,9 +18,9 @@ function BetaPage() {
     <div className="p-8 max-w-[1024px] mx-auto">
       <h1 className="text-3xl font-bold mb-2">EQMonitor v3 ベータプログラム</h1>
       <p className="text-base-content/70 mb-8">
-        EQMonitor v3
-        の最新機能をいち早く体験できるベータプログラムです。TestFlight
-        経由で最新ビルドが自動配信されます。
+        EQMonitor v3の最新機能をいち早く体験できるベータプログラムです。
+        <br />
+        TestFlight経由で最新ビルドが自動配信されます。
       </p>
       <BetaForm />
     </div>
