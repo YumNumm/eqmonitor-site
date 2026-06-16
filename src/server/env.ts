@@ -1,12 +1,11 @@
 import { env } from 'cloudflare:workers'
 
-/**
- * アプリが利用する binding / 環境変数の型。
- * 値の実体は wrangler.jsonc (vars / d1 / kv) と .dev.vars / `wrangler secret` (secrets)。
- */
 export interface AppEnv {
   // bindings
   DB: D1Database
+
+  // service bindings
+  BETA_WORKER: Fetcher
 
   // public vars (wrangler.jsonc)
   TURNSTILE_SITE_KEY: string
@@ -16,8 +15,6 @@ export interface AppEnv {
   // secrets (.dev.vars / wrangler secret)
   TURNSTILE_SECRET_KEY: string
   GITHUB_TOKEN: string
-<<<<<<< Updated upstream
-=======
 
   // BetterAuth Apple OAuth secrets
   APPLE_CLIENT_ID: string
@@ -27,11 +24,11 @@ export interface AppEnv {
 
   // BetterAuth core
   BETTER_AUTH_SECRET: string
+  // 本番のみ設定。未設定（ローカル）ではリクエストから自動検出される。
   BETTER_AUTH_URL?: string
 
   // Beta config
   BETA_GROUP_ID: string
->>>>>>> Stashed changes
 }
 
 export const appEnv = env as unknown as AppEnv

@@ -40,11 +40,25 @@ export async function getAuth(env: AppEnv): Promise<ReturnType<typeof betterAuth
       {
         secret: env.BETTER_AUTH_SECRET,
         baseURL: env.BETTER_AUTH_URL,
-        trustedOrigins: ['https://appleid.apple.com', 'https://eqmonitor.app','https://eqmonitor-site.localhost'],
+        trustedOrigins: ['https://appleid.apple.com', 'https://eqmonitor.app', 'https://eqmonitor-site.localhost'],
         socialProviders: {
           apple: {
             clientId: env.APPLE_CLIENT_ID,
             clientSecret,
+          },
+        },
+        // Apple は response_mode=form_post なので、appleid.apple.com から
+        // /api/auth/callback/apple へクロスサイト POST でコールバックされる。
+        // state cookie が SameSite=Lax だとこの POST で送信されず OAuth state
+        // 検証に失敗するため、state cookie のみ SameSite=None; Secure にする。
+        advanced: {
+          cookies: {
+            state: {
+              attributes: {
+                sameSite: 'none',
+                secure: true,
+              },
+            },
           },
         },
         plugins: [

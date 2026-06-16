@@ -11,22 +11,38 @@
 
   --color-base-100: #0c0f1a;
   --color-base-200: #141826;
-  --color-base-300: #1f2436;
+  --color-base-300: #232a40;
   --color-base-content: #f8f7fd;
 
-  --color-primary: #1313bc;
+  --color-primary: #4f5bff;
   --color-primary-content: #f8f7fd;
   --color-secondary: #c9cbf0;
-  --color-secondary-content: #1313bc;
-  --color-accent: #c9cbf0;
-  --color-accent-content: #1313bc;
+  --color-secondary-content: #161a2c;
+  --color-accent: #5be0d8;
+  --color-accent-content: #07221f;
 
   --color-neutral: #1f2436;
-  --color-neutral-content: #d9d8d6;
+  --color-neutral-content: #e7e6f2;
+
+  --color-info: #38bdf8;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #fb7185;
+
+  --radius-selector: 0.75rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
 @theme {
   --font-sans: "Google Sans Flex", "Noto Sans JP", sans-serif;
+  --color-brand-from: #4f5bff;
+  --color-brand-to: #7c5bff;
 }
 
 html,
@@ -35,7 +51,133 @@ body {
   font-family: var(--font-sans);
 }
 
+body {
+  background:
+    radial-gradient(
+      60rem 60rem at 85% -10%,
+      color-mix(in oklab, var(--color-primary) 14%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 50rem at -10% 10%,
+      color-mix(in oklab, var(--color-accent) 8%, transparent),
+      transparent 55%
+    ),
+    var(--color-base-100);
+  background-attachment: fixed;
+}
+
 /* Hero のキャッチコピーを文節単位で折り返す */
 .span-break span {
   display: inline-block;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Buttons                                                                     */
+/* -------------------------------------------------------------------------- */
+
+.btn {
+  --btn-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-field);
+  box-shadow: var(--btn-shadow);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    filter 0.2s ease;
+  will-change: transform;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+  filter: brightness(0.97);
+}
+
+.btn:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-primary) 70%, white);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[disabled],
+.btn.btn-disabled {
+  transform: none;
+  box-shadow: none;
+  filter: none;
+  opacity: 0.5;
+}
+
+/* Primary: ブランドグラデーション + グロー */
+.btn-primary {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand-from),
+    var(--color-brand-to)
+  );
+  border: none;
+  color: var(--color-primary-content);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.3),
+    0 6px 20px -8px color-mix(in oklab, var(--color-brand-from) 80%, transparent);
+}
+
+.btn-primary:hover {
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.3),
+    0 12px 28px -8px color-mix(in oklab, var(--color-brand-to) 85%, transparent);
+}
+
+/* Neutral (Apple サインインなど) */
+.btn-neutral {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-neutral) 92%, white 8%),
+    var(--color-neutral)
+  );
+  border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.3),
+    0 8px 24px -12px rgb(0 0 0 / 0.6);
+}
+
+/* Ghost: ホバー時にやわらかく浮かせる */
+.btn-ghost {
+  box-shadow: none;
+}
+
+.btn-ghost:hover {
+  background-color: color-mix(in oklab, var(--color-base-content) 8%, transparent);
+  box-shadow: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Form controls                                                              */
+/* -------------------------------------------------------------------------- */
+
+.input,
+.select,
+.textarea {
+  border-radius: var(--radius-field);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.input:focus,
+.input:focus-within,
+.select:focus,
+.textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--color-primary) 30%, transparent);
+  outline: none;
 }
