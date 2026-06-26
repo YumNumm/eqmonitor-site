@@ -1,6 +1,5 @@
 export interface BetaRegistration {
   id: string
-  user_id: string
   email: string
   platform: string
   status: string
@@ -14,19 +13,17 @@ export async function insertBetaRegistration(
   db: D1Database,
   registration: {
     id: string
-    userId: string
     email: string
     platform: string
   },
 ): Promise<void> {
   await db
     .prepare(
-      `INSERT INTO beta_registrations (id, user_id, email, platform, status, created_at)
-       VALUES (?, ?, ?, ?, 'pending', ?)`,
+      `INSERT INTO beta_registrations (id, email, platform, status, created_at)
+       VALUES (?, ?, ?, 'pending', ?)`,
     )
     .bind(
       registration.id,
-      registration.userId,
       registration.email,
       registration.platform,
       new Date().toISOString(),
@@ -45,12 +42,12 @@ export async function updateWorkflowId(
     .run()
 }
 
-export async function getBetaRegistrationByUserId(
+export async function getBetaRegistrationByEmail(
   db: D1Database,
-  userId: string,
+  email: string,
 ): Promise<BetaRegistration | null> {
   return await db
-    .prepare('SELECT * FROM beta_registrations WHERE user_id = ?')
-    .bind(userId)
+    .prepare('SELECT * FROM beta_registrations WHERE email = ?')
+    .bind(email)
     .first<BetaRegistration>()
 }

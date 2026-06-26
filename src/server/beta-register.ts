@@ -1,37 +1,32 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequest } from '@tanstack/react-start/server'
 import * as v from 'valibot'
 import { hc } from 'hono/client'
 import type { AppType } from 'eqmonitor-beta-worker'
-import { getAuth } from './auth'
 import { appEnv } from './env'
 import {
   insertBetaRegistration,
   updateWorkflowId,
-  getBetaRegistrationByUserId,
+  getBetaRegistrationByEmail,
 } from './beta-db'
+import { verifyTurnstile } from './turnstile'
 import { BetaRegistrationFormSchema } from '~/lib/betaSchema'
 
 type RegisterResult =
   | { ok: true; id: string; workflowId: string }
-  | { ok: false; error: 'unauthorized' | 'already_registered' | 'workflow_failed' }
+  | { ok: false; error: 'turnstile_failed' | 'already_registered' | 'workflow_failed' }
 
 export const registerBeta = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => v.parse(BetaRegistrationFormSchema, d))
   .handler(async ({ data }): Promise<RegisterResult> => {
-    const request = getRequest()
-    const auth = await getAuth(appEnv)
-    const session = await auth.api.getSession({
-      headers: request.headers,
+    const turnstileOk = await verifyTurnstile({
+      secretKey: appEnv.TURNSTILE_SECRET_KEY,
+      token: data.turnstileToken,
     })
-    if (!session) {
-      return { ok: false, error: 'unauthorized' }
+    if (!turnstileOk) {
+      return { ok: false, error: 'turnstile_failed' }
     }
 
-    const existing = await getBetaRegistrationByUserId(
-      appEnv.DB,
-      session.user.id,
-    )
+    const existing = await getBetaRegistrationByEmail(appEnv.DB, data.email)
     if (existing) {
       return { ok: false, error: 'already_registered' }
     }
@@ -39,7 +34,6 @@ export const registerBeta = createServerFn({ method: 'POST' })
     const id = crypto.randomUUID()
     await insertBetaRegistration(appEnv.DB, {
       id,
-      userId: session.user.id,
       email: data.email,
       platform: data.platform,
     })

@@ -8,6 +8,10 @@ export const BetaRegistrationFormSchema = v.object({
     v.minLength(1, 'メールアドレスを入力してください'),
     v.email('メールアドレスの形式が不正です'),
   ),
+  turnstileToken: v.pipe(
+    v.string(),
+    v.minLength(1, '認証を完了してください'),
+  ),
 })
 
 export type BetaRegistrationFormInput = v.InferInput<
