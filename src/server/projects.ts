@@ -1,10 +1,12 @@
 import type { AppEnv } from './env'
 import type { ProjectItem, ProjectsData } from '~/lib/projectsSchema'
 
+const PROJECT_NUMBERS = [12, 13]
+
 const GRAPHQL_QUERY = `
-query($cursor: String) {
+query($number: Int!, $cursor: String) {
   user(login: "YumNumm") {
-    projectV2(number: 12) {
+    projectV2(number: $number) {
       items(first: 100, after: $cursor) {
         nodes {
           fieldValues(first: 8) {
@@ -107,7 +109,10 @@ function toProjectItem(node: GraphQLProjectItem): ProjectItem | null {
   }
 }
 
-async function fetchAllProjectItems(token: string): Promise<ProjectItem[]> {
+async function fetchProjectItems(
+  token: string,
+  projectNumber: number,
+): Promise<ProjectItem[]> {
   const items: ProjectItem[] = []
   let cursor: string | null = null
 
@@ -121,7 +126,7 @@ async function fetchAllProjectItems(token: string): Promise<ProjectItem[]> {
       },
       body: JSON.stringify({
         query: GRAPHQL_QUERY,
-        variables: { cursor },
+        variables: { number: projectNumber, cursor },
       }),
     })
 
@@ -147,6 +152,23 @@ async function fetchAllProjectItems(token: string): Promise<ProjectItem[]> {
     cursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
   } while (cursor)
 
+  return items
+}
+
+async function fetchAllProjectItems(token: string): Promise<ProjectItem[]> {
+  const results = await Promise.all(
+    PROJECT_NUMBERS.map((n) => fetchProjectItems(token, n)),
+  )
+  const seen = new Set<string>()
+  const items: ProjectItem[] = []
+  for (const list of results) {
+    for (const item of list) {
+      if (!seen.has(item.url)) {
+        seen.add(item.url)
+        items.push(item)
+      }
+    }
+  }
   return items
 }
 
