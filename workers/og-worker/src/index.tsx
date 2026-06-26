@@ -4,7 +4,11 @@ import { initWasm, Resvg } from '@resvg/resvg-wasm'
 import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm'
 import notoSansJPBold from './fonts/NotoSansJP-Bold.ttf'
 
-let wasmInitialized = false
+let wasmReady: Promise<void> | null = null
+function ensureWasm() {
+  if (!wasmReady) wasmReady = initWasm(resvgWasm as WebAssembly.Module)
+  return wasmReady
+}
 
 const app = new Hono()
 
@@ -17,10 +21,7 @@ app.get('/', async (c) => {
     return c.text('title must be 200 characters or fewer', 400)
   }
 
-  if (!wasmInitialized) {
-    await initWasm(resvgWasm as WebAssembly.Module)
-    wasmInitialized = true
-  }
+  await ensureWasm()
 
   const svg = await satori(
     <div
