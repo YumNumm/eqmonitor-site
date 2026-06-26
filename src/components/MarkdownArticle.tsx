@@ -1,15 +1,10 @@
-import { marked } from 'marked'
-
 export function MarkdownArticle({
   title,
-  markdown,
+  html,
 }: {
   title: string
-  markdown: string
+  html: string
 }) {
-  // markdown はリポジトリ内の信頼できる静的コンテンツ
-  const html = marked.parse(markdown, { async: false })
-
   return (
     <div className="max-w-[1024px] mx-auto">
       <h1 className="text-4xl font-bold text-center pt-8 pb-4">{title}</h1>

@@ -30,3 +30,4 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 .dev.vars
+.superpowers/

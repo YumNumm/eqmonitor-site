@@ -7,6 +7,7 @@ export interface AppEnv {
 
   // service bindings
   BETA_WORKER: Fetcher
+  OG_WORKER: Fetcher
 
   // public vars (wrangler.jsonc)
   TURNSTILE_SITE_KEY: string

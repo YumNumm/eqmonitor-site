@@ -29,6 +29,10 @@
     {
       "binding": "BETA_WORKER",
       "service": "eqmonitor-beta-worker"
+    },
+    {
+      "binding": "OG_WORKER",
+      "service": "eqmonitor-og-worker"
     }
   ],
 	"triggers": {

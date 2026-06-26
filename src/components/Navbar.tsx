@@ -16,6 +16,9 @@ export function Navbar() {
         </button>
       </Link>
       <div className="flex items-center">
+        <Link to="/blog" className="btn btn-ghost btn-sm mx-1">
+          Blog
+        </Link>
         <a
           href="https://apps.apple.com/us/app/eqmonitor-%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6447546703"
           target="_blank"
