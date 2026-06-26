@@ -11,6 +11,7 @@ const InquirySchema = v.object({
   token: v.pipe(v.string(), v.minLength(1, 'Turnstile token が必要です')),
   app_version: v.optional(v.pipe(v.string(), v.maxLength(50))),
   platform: v.optional(v.pipe(v.string(), v.maxLength(50))),
+  device_info: v.optional(v.pipe(v.string(), v.maxLength(10000))),
 })
 
 function json(data: unknown, status = 200): Response {
@@ -57,6 +58,7 @@ export const Route = createFileRoute('/api/inquiry')({
           app_version: parsed.app_version ?? null,
           platform: parsed.platform ?? null,
           user_agent: request.headers.get('user-agent'),
+          device_info: parsed.device_info ?? null,
         })
 
         // 3. GitHub Issue 作成 (失敗しても問い合わせは保存済みなので 200 を返す)
