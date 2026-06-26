@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import * as v from 'valibot'
 import { ContactFormSchema } from '~/lib/inquirySchema'
+import type { ContactSearch } from '~/lib/contactSearchSchema'
 
 const InquiryErrorSchema = v.object({
   error: v.optional(v.string()),
@@ -32,7 +33,12 @@ const TURNSTILE_SCRIPT =
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
-export function ContactForm({ siteKey }: { siteKey: string }) {
+interface ContactFormProps {
+  siteKey: string
+  deviceInfo?: ContactSearch
+}
+
+export function ContactForm({ siteKey, deviceInfo }: ContactFormProps) {
   const widgetRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
   const [token, setToken] = useState('')
@@ -43,6 +49,8 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [includeDeviceInfo, setIncludeDeviceInfo] = useState(true)
+  const [showDeviceInfoModal, setShowDeviceInfoModal] = useState(false)
 
   // Turnstile ウィジェットを explicit rendering で描画する
   useEffect(() => {
@@ -109,10 +117,34 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
     setStatus('submitting')
     setErrorMsg('')
     try {
+      // Build device_info JSON if device info is present and toggled on
+      let device_info: string | undefined
+      if (deviceInfo && includeDeviceInfo) {
+        let parsedDeviceInfo: unknown
+        if (deviceInfo.deviceInfo) {
+          try {
+            parsedDeviceInfo = JSON.parse(deviceInfo.deviceInfo)
+          } catch {
+            parsedDeviceInfo = deviceInfo.deviceInfo
+          }
+        }
+        device_info = JSON.stringify({
+          deviceId: deviceInfo.deviceId,
+          appVersion: deviceInfo.appVersion,
+          buildNumber: deviceInfo.buildNumber,
+          os: deviceInfo.os,
+          ...(parsedDeviceInfo != null ? { deviceInfo: parsedDeviceInfo } : {}),
+        })
+      }
+
       const res = await fetch('/api/inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, ...validated.output }),
+        body: JSON.stringify({
+          token,
+          ...validated.output,
+          ...(device_info != null ? { device_info } : {}),
+        }),
       })
       if (res.ok) {
         setStatus('success')
@@ -154,7 +186,34 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl mx-auto">
+      {deviceInfo && (
+        <div className="flex items-center justify-between rounded-lg border border-base-300 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              className="toggle toggle-primary"
+              checked={includeDeviceInfo}
+              onChange={(e) => setIncludeDeviceInfo(e.target.checked)}
+            />
+            <div>
+              <p className="text-sm font-medium">端末情報を送信に含める</p>
+              <p className="text-xs text-base-content/60">
+                問題の調査に役立ちます。{' '}
+                <button
+                  type="button"
+                  className="link link-primary"
+                  onClick={() => setShowDeviceInfoModal(true)}
+                >
+                  含まれる情報
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <label className="form-control w-full">
         <span className="label-text mb-1">種別</span>
         <select
@@ -253,5 +312,74 @@ export function ContactForm({ siteKey }: { siteKey: string }) {
           : 'プライバシーポリシーに同意して送信する'}
       </button>
     </form>
+
+    {deviceInfo && (
+      <dialog className={`modal ${showDeviceInfoModal ? 'modal-open' : ''}`}>
+        <div className="modal-box max-w-lg">
+          <h3 className="text-lg font-bold mb-4">送信される端末情報</h3>
+          <div className="flex flex-col gap-2 text-sm">
+            {deviceInfo.deviceId && (
+              <p>
+                <span className="font-medium">Device ID:</span>{' '}
+                {deviceInfo.deviceId}
+              </p>
+            )}
+            {deviceInfo.appVersion && (
+              <p>
+                <span className="font-medium">App Version:</span>{' '}
+                {deviceInfo.appVersion}
+              </p>
+            )}
+            {deviceInfo.buildNumber && (
+              <p>
+                <span className="font-medium">Build Number:</span>{' '}
+                {deviceInfo.buildNumber}
+              </p>
+            )}
+            {deviceInfo.os && (
+              <p>
+                <span className="font-medium">OS:</span> {deviceInfo.os}
+              </p>
+            )}
+            {deviceInfo.deviceInfo && (
+              <div>
+                <p className="font-medium mb-1">Device Info:</p>
+                <pre className="bg-base-200 rounded-lg p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all">
+                  {(() => {
+                    try {
+                      return JSON.stringify(
+                        JSON.parse(deviceInfo.deviceInfo),
+                        null,
+                        2,
+                      )
+                    } catch {
+                      return deviceInfo.deviceInfo
+                    }
+                  })()}
+                </pre>
+              </div>
+            )}
+          </div>
+          <div className="modal-action">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setShowDeviceInfoModal(false)}
+            >
+              閉じる
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button
+            type="button"
+            onClick={() => setShowDeviceInfoModal(false)}
+          >
+            close
+          </button>
+        </form>
+      </dialog>
+    )}
+    </>
   )
 }
