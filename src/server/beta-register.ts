@@ -58,3 +58,20 @@ export const registerBeta = createServerFn({ method: 'POST' })
 
     return { ok: true, id, workflowId: result.workflowId }
   })
+
+const BetaStatusInputSchema = v.object({
+  workflowId: v.pipe(v.string(), v.minLength(1)),
+})
+
+export const getBetaStatus = createServerFn({ method: 'GET' })
+  .inputValidator((d: unknown) => v.parse(BetaStatusInputSchema, d))
+  .handler(async ({ data }) => {
+    const client = hc<AppType>('http://dummy', {
+      fetch: appEnv.BETA_WORKER.fetch.bind(appEnv.BETA_WORKER),
+    })
+    const res = await client.status[':workflowId'].$get({
+      param: { workflowId: data.workflowId },
+    })
+
+    return await res.json()
+  })
