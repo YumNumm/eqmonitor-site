@@ -84,7 +84,7 @@ function extractField(
 }
 
 function toProjectItem(node: GraphQLProjectItem): ProjectItem | null {
-  if (!node.content) return null
+  if (!node.content?.labels) return null
 
   const labels = node.content.labels.nodes.map((l) => l.name)
   if (!labels.includes('public')) return null
