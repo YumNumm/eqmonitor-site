@@ -1,10 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import * as v from 'valibot'
 import { appEnv } from '~/server/env'
 import { seo } from '~/utils/seo'
 import { ContactForm } from '~/components/ContactForm'
-import { ContactSearchSchema } from '~/lib/contactSearchSchema'
+import { validateContactSearch } from '~/lib/contactSearchSchema'
 
 // site key は public だが、ランタイムの env から取得することで
 // 再ビルドなしに鍵を差し替えられるようにする。
@@ -13,7 +12,7 @@ const getSiteKey = createServerFn().handler(() => {
 })
 
 export const Route = createFileRoute('/contact')({
-  validateSearch: (search) => v.parse(ContactSearchSchema, search),
+  validateSearch: validateContactSearch,
   head: () => ({
     meta: seo({
       title: 'お問い合わせ | EQMonitor',
