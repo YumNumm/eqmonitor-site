@@ -18,6 +18,7 @@ export const Route = createFileRoute('/blog/$slug')({
       ? seo({
           title: `${loaderData.title} | EQMonitor Blog`,
           description: loaderData.description,
+          image: `/api/og?title=${encodeURIComponent(loaderData.title)}`,
         })
       : [],
   }),
