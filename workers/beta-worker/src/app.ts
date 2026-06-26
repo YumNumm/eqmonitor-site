@@ -31,10 +31,11 @@ const route = app
       const instance = await c.env.BETA_WORKFLOW.get(workflowId)
       const status = await instance.status()
 
+      const error = status.error
       return c.json({
         status: status.status,
         output: status.output,
-        error: status.error,
+        error: error instanceof Error ? error.message : error ? String(error) : undefined,
       })
     } catch {
       return c.json({ status: 'errored' as const, error: 'Workflow not found' }, 404)

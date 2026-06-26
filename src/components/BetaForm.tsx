@@ -97,7 +97,12 @@ export function BetaForm({ siteKey }: { siteKey: string }) {
           setStatus('success')
         } else if (result.status === 'errored') {
           if (pollingRef.current) clearInterval(pollingRef.current)
-          setErrorMsg(result.error ?? '登録処理中にエラーが発生しました。')
+          const errorDetail = result.error
+          setErrorMsg(
+            typeof errorDetail === 'string'
+              ? errorDetail
+              : errorDetail?.message ?? '登録処理中にエラーが発生しました。',
+          )
           setStatus('error')
         }
       } catch {
