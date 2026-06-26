@@ -69,7 +69,7 @@ export async function createIssue(params: {
   const { token, owner, repo, inquiry } = params
 
   const title = `[${TYPE_LABEL[inquiry.type]}] ${inquiry.subject}`
-  const body = [
+  let body = [
     `## ${inquiry.subject}`,
     '',
     inquiry.message,
@@ -84,6 +84,46 @@ export async function createIssue(params: {
   ]
     .filter((line) => line !== null)
     .join('\n')
+
+  // Append device info as a collapsible section if present
+  if (inquiry.device_info) {
+    let deviceSection: string
+    try {
+      const info = JSON.parse(inquiry.device_info) as Record<string, unknown>
+      const lines = [
+        '',
+        '<details>',
+        '<summary>Device Info</summary>',
+        '',
+        info.deviceId != null ? `- Device ID: ${info.deviceId}` : null,
+        info.appVersion != null ? `- App Version: ${info.appVersion}` : null,
+        info.buildNumber != null ? `- Build Number: ${info.buildNumber}` : null,
+        info.os != null ? `- OS: ${info.os}` : null,
+        '',
+        '```json',
+        JSON.stringify(info, null, 2),
+        '```',
+        '',
+        '</details>',
+      ]
+        .filter((line) => line !== null)
+        .join('\n')
+      deviceSection = lines
+    } catch {
+      deviceSection = [
+        '',
+        '<details>',
+        '<summary>Device Info</summary>',
+        '',
+        '```',
+        inquiry.device_info,
+        '```',
+        '',
+        '</details>',
+      ].join('\n')
+    }
+    body += deviceSection
+  }
 
   // ラベルが無いと issue 作成時に 422 になるため、先に存在を保証してから付与する
   const label = LABEL_DEFINITION[inquiry.type]
