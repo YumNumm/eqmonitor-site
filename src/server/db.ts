@@ -12,6 +12,7 @@ export interface Inquiry {
   app_version: string | null
   platform: string | null
   user_agent: string | null
+  device_info: string | null
   status: InquiryStatus
   github_issue_number: number | null
 }
@@ -25,8 +26,8 @@ export async function insertInquiry(
   await db
     .prepare(
       `INSERT INTO inquiries
-        (id, created_at, type, name, email, subject, message, app_version, platform, user_agent, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')`,
+        (id, created_at, type, name, email, subject, message, app_version, platform, user_agent, device_info, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')`,
     )
     .bind(
       inquiry.id,
@@ -39,6 +40,7 @@ export async function insertInquiry(
       inquiry.app_version,
       inquiry.platform,
       inquiry.user_agent,
+      inquiry.device_info,
     )
     .run()
 }
