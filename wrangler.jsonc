@@ -6,11 +6,7 @@
 		"nodejs_compat"
 	],
 	"main": "src/server/server-entry.ts",
-	"observability": {
-		"enabled": true
-	},
 	"vars": {
-		// Cloudflare Turnstile の site key (public)。ランタイムで loader 経由フォームへ注入。
 		"TURNSTILE_SITE_KEY": "0x4AAAAAADXHIKnSew1W7HAw",
 		"GITHUB_OWNER": "YumNumm",
 		"GITHUB_REPO": "eqmonitor-backend"
@@ -36,12 +32,21 @@
     }
   ],
 	"triggers": {
-		"crons": ["0 * * * *"]
+		"crons": ["* * * * *"]
 	},
   "routes": [
     {
       "custom_domain": true,
       "pattern": "eqmonitor.app"
     }
-  ]
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false,
+    }
+  }
 }

@@ -17,10 +17,10 @@ export const Route = createFileRoute('/projects')({
 const PRIORITY_ORDER: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 }
 
 const PRIORITY_BADGE: Record<string, string> = {
-  P0: 'badge-error text-error-content',
-  P1: 'badge-warning text-warning-content',
-  P2: 'badge-info text-info-content',
-  P3: 'badge-success text-success-content',
+  P0: 'badge-outline border-error text-error',
+  P1: 'badge-outline border-warning text-warning',
+  P2: 'badge-outline border-accent text-accent',
+  P3: 'badge-outline border-base-content/40 text-base-content/60',
 }
 
 function sortByPriority(a: ProjectItem, b: ProjectItem): number {
@@ -60,7 +60,7 @@ function formatUpdatedAt(isoString: string): string {
   const day = jst.getUTCDate()
   const hours = String(jst.getUTCHours()).padStart(2, '0')
   const minutes = String(jst.getUTCMinutes()).padStart(2, '0')
-  return `${day}日 ${hours}:${minutes}`
+  return `${day}日 ${hours}:${minutes} JST`
 }
 
 function formatDueDate(isoString: string): string {
@@ -110,17 +110,13 @@ function ProjectsPage() {
         ))}
       </div>
 
-      <div className="alert mt-12 border border-info/40 bg-info/20 text-base-content shadow-sm">
-        <div>
-          <p>
-            機能のリクエストや不具合の報告は{' '}
-            <Link to="/contact" className="link link-info">
-              お問い合わせフォーム
-            </Link>{' '}
-            からお願いします。
-          </p>
-        </div>
-      </div>
+      <p className="mt-12 text-center text-base-content/50 text-sm">
+        機能のリクエストや不具合の報告は{' '}
+        <Link to="/contact" className="link link-accent">
+          お問い合わせフォーム
+        </Link>{' '}
+        からお願いします。
+      </p>
     </div>
   )
 }
@@ -137,36 +133,34 @@ function MilestoneGroup({
   const total = milestoneInfo
     ? milestoneInfo.openIssues + milestoneInfo.closedIssues
     : 0
-  const progress = total > 0 ? Math.round((milestoneInfo!.closedIssues / total) * 100) : 0
+  const progress =
+    total > 0 ? (milestoneInfo!.closedIssues / total) * 100 : 0
 
   return (
-    <div className="card bg-base-200/50 shadow">
-      <div className="card-body">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <h2 className="card-title text-xl">{milestone ?? '未分類'}</h2>
-          {milestoneInfo && (
-            <div className="flex items-center gap-3 text-sm text-base-content/60">
-              {milestoneInfo.dueOn && (
-                <span>期限: {formatDueDate(milestoneInfo.dueOn)}</span>
-              )}
-              <span>
-                {milestoneInfo.closedIssues}/{total} 完了
-              </span>
-            </div>
-          )}
-        </div>
-        {milestoneInfo && total > 0 && (
-          <progress
-            className="progress progress-primary w-full"
-            value={progress}
-            max={100}
-          />
+    <div>
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
+        <h2 className="text-xl font-bold">{milestone ?? '未分類'}</h2>
+        {milestoneInfo && (
+          <div className="flex items-center gap-3 text-sm text-base-content/60">
+            {milestoneInfo.dueOn && (
+              <span>期限: {formatDueDate(milestoneInfo.dueOn)}</span>
+            )}
+            <span>{progress.toFixed(1)}% 完了</span>
+          </div>
         )}
-        <div className="space-y-2">
-          {items.map((item) => (
-            <ProjectItemCard key={item.url} item={item} />
-          ))}
+      </div>
+      {milestoneInfo && total > 0 && (
+        <div className="w-full bg-base-300 rounded-full h-2 mb-3">
+          <div
+            className="bg-accent h-2 rounded-full transition-all"
+            style={{ width: `${progress}%` }}
+          />
         </div>
+      )}
+      <div className="space-y-2">
+        {items.map((item) => (
+          <ProjectItemCard key={item.url} item={item} />
+        ))}
       </div>
     </div>
   )
@@ -195,7 +189,7 @@ function ProjectItemCard({ item }: { item: ProjectItem }) {
   const repo = repoNameFromUrl(item.url)
 
   return (
-    <div className="collapse collapse-arrow bg-base-100">
+    <div className="collapse collapse-arrow bg-base-100 border border-base-300">
       <input type="checkbox" />
       <div className="collapse-title flex items-center gap-2">
         {item.priority && (
@@ -205,7 +199,7 @@ function ProjectItemCard({ item }: { item: ProjectItem }) {
         )}
         <span className="font-medium">{item.title}</span>
         {repo && (
-          <span className="ml-auto badge badge-sm badge-ghost text-base-content/50">
+          <span className="ml-auto badge badge-sm badge-ghost text-base-content/40 text-xs">
             {repo}
           </span>
         )}
@@ -223,7 +217,7 @@ function ProjectItemCard({ item }: { item: ProjectItem }) {
             href={item.url}
             target="_blank"
             rel="noreferrer"
-            className="btn btn-sm btn-ghost text-base-content/50"
+            className="btn btn-sm btn-ghost text-base-content/40"
           >
             GitHub で開く
           </a>
