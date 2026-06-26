@@ -1,9 +1,18 @@
 import type { AppEnv } from './env'
-import type { ProjectItem, ProjectsData } from '~/lib/projectsSchema'
+import type {
+  MilestoneInfo,
+  ProjectItem,
+  ProjectsData,
+} from '~/lib/projectsSchema'
 
 const PROJECT_IDS = [
   'PVT_kwHOBF_bC84BXd5F', // #12 EQMonitor
   'PVT_kwHOBF_bC84BX0S3', // #13 EQMonitor Internal
+]
+
+const REPOS = [
+  { owner: 'YumNumm', name: 'EQMonitor' },
+  { owner: 'YumNumm', name: 'eqmonitor-backend' },
 ]
 
 const GRAPHQL_QUERY = `
@@ -33,11 +42,27 @@ query($projectId: ID!, $cursor: String) {
               title
               body
               url
+              milestone { title }
               labels(first: 10) { nodes { name } }
             }
           }
         }
         pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+}
+`
+
+const MILESTONES_QUERY = `
+query($owner: String!, $name: String!) {
+  repository(owner: $owner, name: $name) {
+    milestones(first: 50, states: OPEN) {
+      nodes {
+        title
+        dueOn
+        openIssues: issues(states: OPEN) { totalCount }
+        closedIssues: issues(states: CLOSED) { totalCount }
       }
     }
   }
@@ -55,6 +80,7 @@ interface GraphQLIssueContent {
   title: string
   body: string
   url: string
+  milestone: { title: string } | null
   labels: { nodes: Array<{ name: string }> }
 }
 
@@ -63,12 +89,27 @@ interface GraphQLProjectItem {
   content: GraphQLIssueContent | null
 }
 
-interface GraphQLResponse {
+interface GraphQLProjectResponse {
   data: {
     node: {
       items: {
         nodes: GraphQLProjectItem[]
         pageInfo: { hasNextPage: boolean; endCursor: string | null }
+      }
+    }
+  }
+}
+
+interface GraphQLMilestonesResponse {
+  data: {
+    repository: {
+      milestones: {
+        nodes: Array<{
+          title: string
+          dueOn: string | null
+          openIssues: { totalCount: number }
+          closedIssues: { totalCount: number }
+        }>
       }
     }
   }
@@ -106,8 +147,40 @@ function toProjectItem(node: GraphQLProjectItem): ProjectItem | null {
     body: node.content.body ?? '',
     url: node.content.url,
     priority,
-    milestone: extractField(node.fieldValues.nodes, 'Milestone'),
+    milestone: node.content.milestone?.title ?? null,
   }
+}
+
+async function graphqlRequest<T>(
+  token: string,
+  query: string,
+  variables: Record<string, unknown>,
+): Promise<T> {
+  const res = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'User-Agent': 'eqmonitor-site',
+    },
+    body: JSON.stringify({ query, variables }),
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `GitHub GraphQL API error: ${res.status} ${await res.text()}`,
+    )
+  }
+
+  const json = (await res.json()) as T & {
+    errors?: Array<{ message: string }>
+  }
+  if (json.errors?.length) {
+    throw new Error(
+      `GitHub GraphQL errors: ${json.errors.map((e) => e.message).join(', ')}`,
+    )
+  }
+  return json
 }
 
 async function fetchProjectItems(
@@ -118,31 +191,11 @@ async function fetchProjectItems(
   let cursor: string | null = null
 
   do {
-    const res = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'eqmonitor-site',
-      },
-      body: JSON.stringify({
-        query: GRAPHQL_QUERY,
-        variables: { projectId, cursor },
-      }),
-    })
-
-    if (!res.ok) {
-      throw new Error(`GitHub GraphQL API error: ${res.status} ${await res.text()}`)
-    }
-
-    const json = (await res.json()) as GraphQLResponse & {
-      errors?: Array<{ message: string }>
-    }
-    if (json.errors?.length) {
-      throw new Error(
-        `GitHub GraphQL errors: ${json.errors.map((e) => e.message).join(', ')}`,
-      )
-    }
+    const json = await graphqlRequest<GraphQLProjectResponse>(
+      token,
+      GRAPHQL_QUERY,
+      { projectId, cursor },
+    )
     const page = json.data.node.items
 
     for (const node of page.nodes) {
@@ -173,11 +226,44 @@ async function fetchAllProjectItems(token: string): Promise<ProjectItem[]> {
   return items
 }
 
+async function fetchMilestones(token: string): Promise<MilestoneInfo[]> {
+  const results = await Promise.all(
+    REPOS.map((repo) =>
+      graphqlRequest<GraphQLMilestonesResponse>(token, MILESTONES_QUERY, repo),
+    ),
+  )
+
+  const merged = new Map<string, MilestoneInfo>()
+  for (const result of results) {
+    for (const ms of result.data.repository.milestones.nodes) {
+      const existing = merged.get(ms.title)
+      if (existing) {
+        existing.openIssues += ms.openIssues.totalCount
+        existing.closedIssues += ms.closedIssues.totalCount
+        if (!existing.dueOn && ms.dueOn) existing.dueOn = ms.dueOn
+      } else {
+        merged.set(ms.title, {
+          title: ms.title,
+          dueOn: ms.dueOn,
+          openIssues: ms.openIssues.totalCount,
+          closedIssues: ms.closedIssues.totalCount,
+        })
+      }
+    }
+  }
+
+  return Array.from(merged.values())
+}
+
 export async function fetchAndStoreProjects(env: AppEnv): Promise<void> {
-  const items = await fetchAllProjectItems(env.GITHUB_TOKEN)
+  const [items, milestones] = await Promise.all([
+    fetchAllProjectItems(env.GITHUB_TOKEN),
+    fetchMilestones(env.GITHUB_TOKEN),
+  ])
 
   const data: ProjectsData = {
     items,
+    milestones,
     updatedAt: new Date().toISOString(),
   }
 

@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { marked } from 'marked'
-import type { ProjectItem } from '~/lib/projectsSchema'
+import type { MilestoneInfo, ProjectItem } from '~/lib/projectsSchema'
 import { appEnv } from '~/server/env'
 import { getProjectsData } from '~/server/projects'
+
 const loadProjectsData = createServerFn().handler(async () => {
   return await getProjectsData(appEnv.PROJECTS_KV)
 })
@@ -16,10 +17,10 @@ export const Route = createFileRoute('/projects')({
 const PRIORITY_ORDER: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 }
 
 const PRIORITY_BADGE: Record<string, string> = {
-  P0: 'badge-error',
-  P1: 'badge-warning',
-  P2: 'badge-info',
-  P3: 'badge-success',
+  P0: 'badge-error text-error-content',
+  P1: 'badge-warning text-warning-content',
+  P2: 'badge-info text-info-content',
+  P3: 'badge-success text-success-content',
 }
 
 function sortByPriority(a: ProjectItem, b: ProjectItem): number {
@@ -62,6 +63,11 @@ function formatUpdatedAt(isoString: string): string {
   return `${day}日 ${hours}:${minutes}`
 }
 
+function formatDueDate(isoString: string): string {
+  const date = new Date(isoString)
+  return `${date.getUTCFullYear()}/${date.getUTCMonth() + 1}/${date.getUTCDate()}`
+}
+
 function ProjectsPage() {
   const data = Route.useLoaderData()
 
@@ -77,6 +83,9 @@ function ProjectsPage() {
   }
 
   const groups = groupByMilestone(data.items)
+  const milestoneMap = new Map(
+    (data.milestones ?? []).map((ms) => [ms.title, ms]),
+  )
 
   return (
     <div className="p-8 max-w-[1024px] mx-auto">
@@ -93,6 +102,9 @@ function ProjectsPage() {
           <MilestoneGroup
             key={group.milestone ?? '__none__'}
             milestone={group.milestone}
+            milestoneInfo={
+              group.milestone ? milestoneMap.get(group.milestone) : undefined
+            }
             items={group.items}
           />
         ))}
@@ -115,15 +127,41 @@ function ProjectsPage() {
 
 function MilestoneGroup({
   milestone,
+  milestoneInfo,
   items,
 }: {
   milestone: string | null
+  milestoneInfo?: MilestoneInfo
   items: ProjectItem[]
 }) {
+  const total = milestoneInfo
+    ? milestoneInfo.openIssues + milestoneInfo.closedIssues
+    : 0
+  const progress = total > 0 ? Math.round((milestoneInfo!.closedIssues / total) * 100) : 0
+
   return (
     <div className="card bg-base-200/50 shadow">
       <div className="card-body">
-        <h2 className="card-title text-xl">{milestone ?? '未分類'}</h2>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <h2 className="card-title text-xl">{milestone ?? '未分類'}</h2>
+          {milestoneInfo && (
+            <div className="flex items-center gap-3 text-sm text-base-content/60">
+              {milestoneInfo.dueOn && (
+                <span>期限: {formatDueDate(milestoneInfo.dueOn)}</span>
+              )}
+              <span>
+                {milestoneInfo.closedIssues}/{total} 完了
+              </span>
+            </div>
+          )}
+        </div>
+        {milestoneInfo && total > 0 && (
+          <progress
+            className="progress progress-primary w-full"
+            value={progress}
+            max={100}
+          />
+        )}
         <div className="space-y-2">
           {items.map((item) => (
             <ProjectItemCard key={item.url} item={item} />
@@ -137,7 +175,6 @@ function MilestoneGroup({
 const markedWithSafeHtml = marked.use({
   renderer: {
     html(token) {
-      // Escape raw HTML blocks instead of rendering them to prevent XSS
       return token.text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -146,10 +183,16 @@ const markedWithSafeHtml = marked.use({
   },
 })
 
+function repoNameFromUrl(url: string): string {
+  const match = url.match(/github\.com\/[^/]+\/([^/]+)/)
+  return match?.[1] ?? ''
+}
+
 function ProjectItemCard({ item }: { item: ProjectItem }) {
   const html = item.body
     ? (markedWithSafeHtml.parse(item.body, { async: false }) as string)
     : ''
+  const repo = repoNameFromUrl(item.url)
 
   return (
     <div className="collapse collapse-arrow bg-base-100">
@@ -161,25 +204,31 @@ function ProjectItemCard({ item }: { item: ProjectItem }) {
           </span>
         )}
         <span className="font-medium">{item.title}</span>
-        <a
-          href={item.url}
-          target="_blank"
-          rel="noreferrer"
-          className="ml-auto link link-hover text-base-content/50 text-sm"
-          onClick={(e) => e.stopPropagation()}
-        >
-          GitHub
-        </a>
+        {repo && (
+          <span className="ml-auto badge badge-sm badge-ghost text-base-content/50">
+            {repo}
+          </span>
+        )}
       </div>
-      {html && (
-        <div className="collapse-content">
+      <div className="collapse-content">
+        {html && (
           <article
             className="prose prose-sm prose-invert max-w-none"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: GitHub Issue body from KV cache
             dangerouslySetInnerHTML={{ __html: html }}
           />
+        )}
+        <div className="mt-4">
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-sm btn-ghost text-base-content/50"
+          >
+            GitHub で開く
+          </a>
         </div>
-      )}
+      </div>
     </div>
   )
 }
