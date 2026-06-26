@@ -85,21 +85,38 @@ remark-parse → remark-gfm → remark-rehype → rehype-shiki → rehype-string
 
 パース済みHTMLを `dangerouslySetInnerHTML` で表示。信頼できる自リポジトリ内コンテンツのみを対象とする。
 
-## OGP画像生成（別Workers）
+## OGP画像生成（内部 Worker）
 
 ### 構成
 
-`workers/og-worker/` に別の Cloudflare Worker として配置。
+`workers/og-worker/` に Cloudflare Worker として配置。beta-worker と同じパターンで、メインの eqmonitor-site Worker からサービスバインディング (`OG_WORKER: Fetcher`) 経由で内部ルーティングする。独自ドメインは不要。
 
 使用ライブラリ:
 - `satori` (`satori/standalone`)
 - `@resvg/resvg-wasm`
 
+### wrangler 設定
+
+**workers/og-worker/wrangler.jsonc**:
+- `workers_dev: false`（外部公開しない）
+
+**wrangler.jsonc（メイン）** に追加:
+```jsonc
+"services": [
+  // 既存
+  { "binding": "BETA_WORKER", "service": "eqmonitor-beta-worker" },
+  // 追加
+  { "binding": "OG_WORKER", "service": "eqmonitor-og-worker" }
+]
+```
+
+**src/server/env.ts** に `OG_WORKER: Fetcher` を追加。
+
 ### エンドポイント
 
-`GET /blog/:slug?title=...`
+`GET /?title=...`
 
-クエリパラメータで `title` を受け取りOGP画像を生成。Worker 側で記事ファイルを読む必要がなく、独立性が保てる。
+メイン Worker 側からは `appEnv.OG_WORKER.fetch(new Request('https://dummy/?title=...'))` のようにサービスバインディング経由で呼び出す。
 
 ### 画像仕様
 
@@ -117,7 +134,7 @@ Noto Sans JP を Workers 内にバンドル。
 
 ### ブログ側での参照
 
-個別記事の `head` で `og:image` に OGP Worker の URL を設定。
+個別記事ページの `loader` で OGP Worker をサービスバインディング経由で呼び出し、生成された画像のURLを `head` の `og:image` に設定。メイン Worker 側に `/api/og` のようなプロキシエンドポイントを用意し、外部からのOGPクローラーがアクセスできるようにする。
 
 ## 追加依存パッケージ
 
