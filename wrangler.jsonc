@@ -23,12 +23,21 @@
 			"database_id": "d98dba26-a8c3-4f4a-8b89-66ffc07c1901"
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "PROJECTS_KV",
+			"id": "PLACEHOLDER_KV_ID"
+		}
+	],
   "services": [
     {
       "binding": "BETA_WORKER",
       "service": "eqmonitor-beta-worker"
     }
   ],
+	"triggers": {
+		"crons": ["0 * * * *"]
+	},
   "routes": [
     {
       "custom_domain": true,

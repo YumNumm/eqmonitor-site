@@ -3,6 +3,7 @@ import { env } from 'cloudflare:workers'
 export interface AppEnv {
   // bindings
   DB: D1Database
+  PROJECTS_KV: KVNamespace
 
   // service bindings
   BETA_WORKER: Fetcher
