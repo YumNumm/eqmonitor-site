@@ -1,8 +1,7 @@
 import { Hono } from 'hono'
 import satori from 'satori'
 import { initWasm, Resvg } from '@resvg/resvg-wasm'
-// @ts-expect-error — binary import handled by Wrangler rules
-import resvgWasm from '../node_modules/@resvg/resvg-wasm/index_bg.wasm'
+import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm'
 import notoSansJPBold from './fonts/NotoSansJP-Bold.ttf'
 
 let wasmInitialized = false
@@ -13,6 +12,9 @@ app.get('/', async (c) => {
   const title = c.req.query('title')
   if (!title) {
     return c.text('title query parameter is required', 400)
+  }
+  if (title.length > 200) {
+    return c.text('title must be 200 characters or fewer', 400)
   }
 
   if (!wasmInitialized) {

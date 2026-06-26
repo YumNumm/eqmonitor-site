@@ -13,6 +13,11 @@ export const Route = createFileRoute('/api/og')({
             status: 400,
           })
         }
+        if (title.length > 200) {
+          return new Response('title must be 200 characters or fewer', {
+            status: 400,
+          })
+        }
 
         const ogUrl = new URL('https://og-worker.internal/')
         ogUrl.searchParams.set('title', title)
