@@ -76,18 +76,30 @@ query($cursor: String) {
 
 ### KV に保存するデータ構造
 
+Valibot でスキーマ定義する（`src/lib/projectsSchema.ts`）。
+
 ```typescript
-type ProjectItem = {
-  title: string
-  body: string       // Markdown (生テキスト)
-  url: string        // GitHub Issue URL
-  priority: 'P0' | 'P1' | 'P2' | 'P3' | null
-  milestone: string | null
-}
+import * as v from 'valibot'
+
+export const ProjectItemSchema = v.object({
+  title: v.string(),
+  body: v.string(),           // Markdown (生テキスト)
+  url: v.pipe(v.string(), v.url()),
+  priority: v.nullable(v.picklist(['P0', 'P1', 'P2', 'P3'])),
+  milestone: v.nullable(v.string()),
+})
+
+export const ProjectsDataSchema = v.object({
+  items: v.array(ProjectItemSchema),
+  updatedAt: v.string(),      // ISO 8601 形式
+})
+
+export type ProjectItem = v.InferOutput<typeof ProjectItemSchema>
+export type ProjectsData = v.InferOutput<typeof ProjectsDataSchema>
 ```
 
 KV キー: `projects:items`
-KV 値: `ProjectItem[]` (JSON)
+KV 値: `ProjectsData` (JSON) — アイテム配列と最終更新時刻を含む
 
 ### cron handler の実装場所
 
@@ -117,6 +129,7 @@ loader で `getProjectItems()` を呼び出し、SSR でデータを含む。
 ┌─────────────────────────────────────────────┐
 │  ヘッダー: "プロジェクト"                      │
 │  サブテキスト: 開発の進捗状況を公開しています    │
+│  最終更新: 27日 14:00                         │
 │                                             │
 │  ┌─ Milestone: v3.0 ──────────────────────┐ │
 │  │  🔴 P0  Issue Title                    │ │
@@ -154,6 +167,7 @@ loader で `getProjectItems()` を呼び出し、SSR でデータを含む。
 - body は既存の MarkdownArticle コンポーネント (marked) でレンダリング
 - Milestone が null のアイテムは「未分類」として最後に表示
 - 各アイテムに GitHub Issue へのリンクアイコン
+- ヘッダー下に最終更新時刻を `DD日 HH:mm` 形式で表示（`updatedAt` を JST でフォーマット）
 
 ### Navbar
 
@@ -171,6 +185,8 @@ src/
 │   └── projects.tsx          # /projects ページ
 ├── server/
 │   └── projects.ts           # GitHub API + KV 操作
+├── lib/
+│   └── projectsSchema.ts    # Valibot スキーマ定義
 ├── components/
 │   └── (既存の MarkdownArticle.tsx を再利用)
 wrangler.jsonc                 # KV バインディング + cron trigger 追加
