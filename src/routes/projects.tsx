@@ -4,19 +4,11 @@ import { marked } from 'marked'
 import type { ProjectItem } from '~/lib/projectsSchema'
 import { appEnv } from '~/server/env'
 import { getProjectsData } from '~/server/projects'
-import { seo } from '~/utils/seo'
-
 const loadProjectsData = createServerFn().handler(async () => {
   return await getProjectsData(appEnv.PROJECTS_KV)
 })
 
 export const Route = createFileRoute('/projects')({
-  head: () => ({
-    meta: seo({
-      title: 'プロジェクト | EQMonitor',
-      description: 'EQMonitor の開発進捗状況を公開しています。',
-    }),
-  }),
   loader: () => loadProjectsData(),
   component: ProjectsPage,
 })

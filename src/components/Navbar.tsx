@@ -15,12 +15,6 @@ export function Navbar() {
           EQMonitor
         </button>
       </Link>
-      <Link
-        to="/projects"
-        className="btn btn-ghost btn-sm text-base-content/70"
-      >
-        プロジェクト
-      </Link>
       <div className="flex items-center">
         <a
           href="https://apps.apple.com/us/app/eqmonitor-%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6447546703"
