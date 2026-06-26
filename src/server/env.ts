@@ -16,6 +16,9 @@ export interface AppEnv {
   // secrets (.dev.vars / wrangler secret)
   TURNSTILE_SECRET_KEY: string
   GITHUB_TOKEN: string
+  GITHUB_APP_ID: string
+  GITHUB_APP_PRIVATE_KEY: string
+  GITHUB_APP_INSTALLATION_ID: string
 
   // Beta config
   BETA_GROUP_ID: string

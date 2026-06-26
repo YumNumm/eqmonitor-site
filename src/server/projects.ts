@@ -1,12 +1,15 @@
 import type { AppEnv } from './env'
 import type { ProjectItem, ProjectsData } from '~/lib/projectsSchema'
 
-const PROJECT_NUMBERS = [12, 13]
+const PROJECT_IDS = [
+  'PVT_kwHOBF_bC84BXd5F', // #12 EQMonitor
+  'PVT_kwHOBF_bC84BX0S3', // #13 EQMonitor Internal
+]
 
 const GRAPHQL_QUERY = `
-query($number: Int!, $cursor: String) {
-  user(login: "YumNumm") {
-    projectV2(number: $number) {
+query($projectId: ID!, $cursor: String) {
+  node(id: $projectId) {
+    ... on ProjectV2 {
       items(first: 100, after: $cursor) {
         nodes {
           fieldValues(first: 8) {
@@ -62,12 +65,10 @@ interface GraphQLProjectItem {
 
 interface GraphQLResponse {
   data: {
-    user: {
-      projectV2: {
-        items: {
-          nodes: GraphQLProjectItem[]
-          pageInfo: { hasNextPage: boolean; endCursor: string | null }
-        }
+    node: {
+      items: {
+        nodes: GraphQLProjectItem[]
+        pageInfo: { hasNextPage: boolean; endCursor: string | null }
       }
     }
   }
@@ -111,7 +112,7 @@ function toProjectItem(node: GraphQLProjectItem): ProjectItem | null {
 
 async function fetchProjectItems(
   token: string,
-  projectNumber: number,
+  projectId: string,
 ): Promise<ProjectItem[]> {
   const items: ProjectItem[] = []
   let cursor: string | null = null
@@ -126,7 +127,7 @@ async function fetchProjectItems(
       },
       body: JSON.stringify({
         query: GRAPHQL_QUERY,
-        variables: { number: projectNumber, cursor },
+        variables: { projectId, cursor },
       }),
     })
 
@@ -142,7 +143,7 @@ async function fetchProjectItems(
         `GitHub GraphQL errors: ${json.errors.map((e) => e.message).join(', ')}`,
       )
     }
-    const page = json.data.user.projectV2.items
+    const page = json.data.node.items
 
     for (const node of page.nodes) {
       const item = toProjectItem(node)
@@ -157,7 +158,7 @@ async function fetchProjectItems(
 
 async function fetchAllProjectItems(token: string): Promise<ProjectItem[]> {
   const results = await Promise.all(
-    PROJECT_NUMBERS.map((n) => fetchProjectItems(token, n)),
+    PROJECT_IDS.map((id) => fetchProjectItems(token, id)),
   )
   const seen = new Set<string>()
   const items: ProjectItem[] = []

@@ -33,6 +33,9 @@ importers:
       hono:
         specifier: ^4.12.23
         version: 4.12.23
+      jose:
+        specifier: ^6.2.3
+        version: 6.2.3
       marked:
         specifier: ^16.4.0
         version: 16.4.2
