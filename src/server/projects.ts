@@ -129,7 +129,14 @@ async function fetchAllProjectItems(token: string): Promise<ProjectItem[]> {
       throw new Error(`GitHub GraphQL API error: ${res.status} ${await res.text()}`)
     }
 
-    const json = (await res.json()) as GraphQLResponse
+    const json = (await res.json()) as GraphQLResponse & {
+      errors?: Array<{ message: string }>
+    }
+    if (json.errors?.length) {
+      throw new Error(
+        `GitHub GraphQL errors: ${json.errors.map((e) => e.message).join(', ')}`,
+      )
+    }
     const page = json.data.user.projectV2.items
 
     for (const node of page.nodes) {

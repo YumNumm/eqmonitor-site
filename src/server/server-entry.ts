@@ -10,6 +10,10 @@ export default {
     env: AppEnv,
     ctx: ExecutionContext,
   ): Promise<void> {
-    ctx.waitUntil(fetchAndStoreProjects(env))
+    ctx.waitUntil(
+      fetchAndStoreProjects(env).catch((err) => {
+        console.error('Failed to fetch projects:', err)
+      }),
+    )
   },
 }

@@ -142,9 +142,21 @@ function MilestoneGroup({
   )
 }
 
+const markedWithSafeHtml = marked.use({
+  renderer: {
+    html(token) {
+      // Escape raw HTML blocks instead of rendering them to prevent XSS
+      return token.text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+    },
+  },
+})
+
 function ProjectItemCard({ item }: { item: ProjectItem }) {
   const html = item.body
-    ? (marked.parse(item.body, { async: false }) as string)
+    ? (markedWithSafeHtml.parse(item.body, { async: false }) as string)
     : ''
 
   return (
