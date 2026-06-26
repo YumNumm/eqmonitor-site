@@ -117,7 +117,6 @@ export function ContactForm({ siteKey, deviceInfo }: ContactFormProps) {
     setStatus('submitting')
     setErrorMsg('')
     try {
-      // Build device_info JSON if device info is present and toggled on
       let device_info: string | undefined
       if (deviceInfo && includeDeviceInfo) {
         let parsedDeviceInfo: unknown

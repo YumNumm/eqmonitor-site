@@ -5,8 +5,6 @@ import { seo } from '~/utils/seo'
 import { ContactForm } from '~/components/ContactForm'
 import { validateContactSearch } from '~/lib/contactSearchSchema'
 
-// site key は public だが、ランタイムの env から取得することで
-// 再ビルドなしに鍵を差し替えられるようにする。
 const getSiteKey = createServerFn().handler(() => {
   return { siteKey: appEnv.TURNSTILE_SITE_KEY }
 })
@@ -28,7 +26,6 @@ function Contact() {
   const { siteKey } = Route.useLoaderData()
   const search = Route.useSearch()
 
-  // At least one device-related param must be present to treat as WebView context
   const hasDeviceInfo = !!(
     search.deviceId ||
     search.appVersion ||
@@ -43,7 +40,7 @@ function Contact() {
       <p className="text-center text-base-content/70 mb-8">
         ご意見・ご要望・不具合のご報告をお寄せください。
       </p>
-      <div className="alert alert-info max-w-xl mx-auto mb-8">
+      <div className="alert max-w-xl mx-auto mb-8 border border-info/40 bg-info/20 text-base-content shadow-sm">
         <span>
           いただいたお問い合わせには、基本的に個別の返信は行っておりません。
           ただし、内容はすべて開発者が拝見し、今後の改善の参考にさせていただいています。
