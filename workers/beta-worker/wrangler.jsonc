@@ -21,5 +21,11 @@
       "class_name": "BetaRegistrationWorkflow"
     }
   ],
-  "workers_dev": false
+  "workers_dev": false,
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "remote": true
+    }
+  ]
 }

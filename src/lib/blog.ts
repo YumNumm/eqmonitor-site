@@ -7,6 +7,7 @@ export interface BlogPost {
   date: string
   description: string
   tags: string[]
+  image?: string
 }
 
 export interface BlogPostWithHtml extends BlogPost {
@@ -32,6 +33,7 @@ function parseFrontmatter(raw: string, slug: string): BlogPost {
     date: data.date instanceof Date ? data.date.toISOString().split('T')[0] : String(data.date),
     description: data.description,
     tags: data.tags ?? [],
+    image: data.image ?? undefined,
   }
 }
 

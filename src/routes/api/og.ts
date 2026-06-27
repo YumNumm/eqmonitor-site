@@ -19,8 +19,11 @@ export const Route = createFileRoute('/api/og')({
           })
         }
 
+        const image = url.searchParams.get('image')
+
         const ogUrl = new URL('https://og-worker.internal/')
         ogUrl.searchParams.set('title', title)
+        if (image) ogUrl.searchParams.set('image', image)
 
         const response = await appEnv.OG_WORKER.fetch(ogUrl.toString())
         return new Response(response.body, {

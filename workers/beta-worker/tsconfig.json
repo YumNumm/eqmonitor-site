@@ -1,12 +1,11 @@
 {
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "worker-configuration.d.ts"],
   "exclude": ["node_modules", "dist", ".wrangler"],
   "compilerOptions": {
     "strict": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["ES2022"],
-    "types": ["@cloudflare/workers-types"],
     "isolatedModules": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,

@@ -14,7 +14,7 @@
   --color-base-300: #232a40;
   --color-base-content: #f8f7fd;
 
-  --color-primary: #4f5bff;
+  --color-primary: #415EC1;
   --color-primary-content: #f8f7fd;
   --color-secondary: #c9cbf0;
   --color-secondary-content: #161a2c;
@@ -41,8 +41,9 @@
 
 @theme {
   --font-sans: "Google Sans Flex", "Noto Sans JP", sans-serif;
-  --color-brand-from: #4f5bff;
-  --color-brand-to: #7c5bff;
+  --color-brand-from: #3B88E6;
+  --color-brand-mid: #415EC1;
+  --color-brand-to: #463AA2;
 }
 
 html,
@@ -120,6 +121,7 @@ body {
   background-image: linear-gradient(
     135deg,
     var(--color-brand-from),
+    var(--color-brand-mid),
     var(--color-brand-to)
   );
   border: none;

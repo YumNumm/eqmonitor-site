@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 
 export function Footer() {
   return (
-    <footer className="w-full p-4 border-t border-base-300 bg-base-200 shadow md:flex md:items-center md:justify-between md:p-6">
+    <footer className="w-full p-4 border-t border-base-300 bg-base-200 shadow flex flex-col items-start gap-3 md:p-6">
       <span className="text-sm text-base-content/60 sm:text-center">
         EQMonitor is developed by{' '}
         <a href="https://github.com/YumNumm" className="btn-link">
@@ -10,7 +10,7 @@ export function Footer() {
         </a>
         .
       </span>
-      <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-base-content/60 sm:mt-0">
+      <ul className="flex flex-wrap items-center text-sm font-medium text-base-content/60">
         <li>
           <Link to="/privacy_policy" className="hover:underline me-4 md:me-6">
             プライバシーポリシー

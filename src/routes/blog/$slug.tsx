@@ -18,7 +18,7 @@ export const Route = createFileRoute('/blog/$slug')({
       ? seo({
           title: `${loaderData.title} | EQMonitor Blog`,
           description: loaderData.description,
-          image: `https://eqmonitor.app/api/og?title=${encodeURIComponent(loaderData.title)}`,
+          image: `https://eqmonitor.app/api/og?title=${encodeURIComponent(loaderData.title)}${loaderData.image ? `&image=${encodeURIComponent(loaderData.image.startsWith('http') ? loaderData.image : `https://eqmonitor.app${loaderData.image}`)}` : ''}`,
         })
       : [],
   }),
@@ -44,7 +44,7 @@ function BlogPost() {
         )}
       </div>
       <article
-        className="prose md:prose-lg lg:prose-xl prose-invert max-w-none p-8"
+        className="prose prose-invert max-w-none p-8"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: 信頼できる自リポジトリ内 markdown のみ
         dangerouslySetInnerHTML={{ __html: post.html }}
       />
