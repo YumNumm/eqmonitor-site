@@ -14,6 +14,7 @@ export const Route = createFileRoute('/beta')({
       title: 'ベータプログラム | EQMonitor',
       description:
         'EQMonitor v3 ベータプログラムに参加して、最新の機能をいち早く体験しましょう。',
+      image: `https://eqmonitor.app/api/og?type=beta&title=${encodeURIComponent('ベータプログラム')}`,
     }),
   }),
   loader: () => getSiteKey(),

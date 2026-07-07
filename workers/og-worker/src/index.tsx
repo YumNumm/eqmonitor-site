@@ -1,7 +1,9 @@
 import { Hono } from 'hono'
-import satori from 'satori'
 import { initWasm, Resvg } from '@resvg/resvg-wasm'
 import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm'
+import satori from 'satori'
+import appiconPng from './appicon.png'
+import googleSansFlexBold from './fonts/GoogleSansFlex-Bold.ttf'
 import notoSansJPBold from './fonts/NotoSansJP-Bold.ttf'
 
 let wasmReady: Promise<void> | null = null
@@ -9,6 +11,17 @@ function ensureWasm() {
   if (!wasmReady) wasmReady = initWasm(resvgWasm as WebAssembly.Module)
   return wasmReady
 }
+
+function bufferToDataUrl(buf: ArrayBuffer, mime: string): string {
+  const bytes = new Uint8Array(buf)
+  const chunks: string[] = []
+  for (let i = 0; i < bytes.length; i += 8192) {
+    chunks.push(String.fromCharCode(...bytes.subarray(i, i + 8192)))
+  }
+  return `data:${mime};base64,${btoa(chunks.join(''))}`
+}
+
+const APPICON_DATA_URL = bufferToDataUrl(appiconPng as ArrayBuffer, 'image/png')
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
@@ -21,13 +34,8 @@ async function fetchImageAsDataUrl(url: string): Promise<string | null> {
     if (!res.ok) return null
     const buf = await res.arrayBuffer()
     if (buf.byteLength > MAX_IMAGE_BYTES) return null
-    const bytes = new Uint8Array(buf)
-    const chunks: string[] = []
-    for (let i = 0; i < bytes.length; i += 8192) {
-      chunks.push(String.fromCharCode(...bytes.subarray(i, i + 8192)))
-    }
     const type = res.headers.get('Content-Type') || 'image/png'
-    return `data:${type};base64,${btoa(chunks.join(''))}`
+    return bufferToDataUrl(buf, type)
   } catch {
     return null
   }
@@ -36,12 +44,41 @@ async function fetchImageAsDataUrl(url: string): Promise<string | null> {
 function titleFontSize(len: number, hasImage: boolean): number {
   if (hasImage) {
     if (len > 40) return 36
-    if (len > 25) return 40
-    return 44
+    if (len > 25) return 42
+    return 48
   }
-  if (len > 40) return 42
-  if (len > 25) return 48
-  return 54
+  if (len > 60) return 40
+  if (len > 40) return 48
+  if (len > 25) return 56
+  return 64
+}
+
+const TYPE_LABEL: Record<string, string> = {
+  blog: 'BLOG',
+  projects: 'PROJECTS',
+  beta: 'BETA',
+}
+
+function LabelChip({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingLeft: 14,
+        paddingRight: 14,
+        border: '1.5px solid rgba(248, 247, 253, 0.95)',
+        borderRadius: 999,
+        fontSize: 18,
+        color: '#ffffff',
+        fontWeight: 700,
+        letterSpacing: '0.22em',
+      }}
+    >
+      {label}
+    </div>
+  )
 }
 
 const app = new Hono()
@@ -51,6 +88,9 @@ app.get('/', async (c) => {
   if (!title) return c.text('title query parameter is required', 400)
   if (title.length > 200)
     return c.text('title must be 200 characters or fewer', 400)
+
+  const typeParam = c.req.query('type')
+  const label = typeParam ? TYPE_LABEL[typeParam] : undefined
 
   const imageUrl = c.req.query('image')
   const [imageData] = await Promise.all([
@@ -66,148 +106,264 @@ app.get('/', async (c) => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background:
-          'linear-gradient(160deg, #0c0f1a 0%, #131728 40%, #1a1f35 100%)',
-        fontFamily: 'Noto Sans JP',
+        background: '#0c0f1a',
+        fontFamily: 'Google Sans Flex, Noto Sans JP',
         position: 'relative',
         overflow: 'hidden',
+        padding: 48,
       }}
     >
-      {/* Decorative glow — top right */}
+      {/* Radial glow — primary (top-right) — mimics body radial-gradient */}
       <div
         style={{
           position: 'absolute',
-          top: '-120px',
-          right: '-80px',
-          width: '500px',
-          height: '500px',
-          borderRadius: '250px',
+          top: '-260px',
+          right: '-180px',
+          width: '780px',
+          height: '780px',
+          borderRadius: '390px',
           background:
-            'linear-gradient(135deg, rgba(65, 94, 193, 0.15), rgba(59, 136, 230, 0.05))',
+            'radial-gradient(circle, rgba(65, 94, 193, 0.32), rgba(65, 94, 193, 0) 65%)',
         }}
       />
-      {/* Decorative glow — bottom left */}
+      {/* Radial glow — accent (bottom-left) */}
       <div
         style={{
           position: 'absolute',
-          bottom: '-150px',
-          left: '-100px',
-          width: '400px',
-          height: '400px',
-          borderRadius: '200px',
+          bottom: '-220px',
+          left: '-160px',
+          width: '640px',
+          height: '640px',
+          borderRadius: '320px',
           background:
-            'linear-gradient(135deg, rgba(91, 224, 216, 0.06), transparent)',
+            'radial-gradient(circle, rgba(91, 224, 216, 0.18), rgba(91, 224, 216, 0) 65%)',
         }}
       />
 
-      {/* Top accent gradient bar */}
-      <div
-        style={{
-          width: '100%',
-          height: '4px',
-          background: 'linear-gradient(90deg, #3B88E6, #415EC1, #463AA2)',
-          flexShrink: 0,
-        }}
-      />
-
-      {/* Content */}
+      {/* Floating card */}
       <div
         style={{
           display: 'flex',
           flex: 1,
-          paddingTop: 44,
-          paddingRight: 56,
-          paddingBottom: 36,
-          paddingLeft: 56,
+          width: '100%',
+          paddingTop: 56,
+          paddingRight: 64,
+          paddingBottom: 56,
+          paddingLeft: 64,
           flexDirection: 'column',
-          justifyContent: 'space-between',
+          background:
+            'linear-gradient(160deg, rgba(35, 42, 64, 0.78) 0%, rgba(20, 24, 38, 0.72) 100%)',
+          border: '1px solid rgba(248, 247, 253, 0.08)',
+          borderRadius: 28,
+          boxShadow:
+            '0 24px 48px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(248, 247, 253, 0.08) inset',
         }}
       >
-        {/* Branding */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 6,
-              height: 24,
-              background: 'linear-gradient(180deg, #3B88E6, #463AA2)',
-              borderRadius: 3,
-            }}
-          />
-          <div
-            style={{
-              fontSize: 22,
-              color: '#5be0d8',
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-            }}
-          >
-            EQMonitor
-          </div>
-        </div>
-
-        {/* Title area */}
-        <div
-          style={{
-            display: 'flex',
-            flex: 1,
-            alignItems: 'center',
-            gap: 48,
-            marginTop: 16,
-          }}
-        >
+        {hasImage ? (
           <div
             style={{
               display: 'flex',
-              flex: 1,
               flexDirection: 'column',
-              justifyContent: 'center',
+              flex: 1,
+              justifyContent: 'space-between',
             }}
           >
+            {/* Branding: appicon (halo) + EQMonitor + optional type chip */}
             <div
               style={{
-                fontSize: titleFontSize(title.length, hasImage),
+                display: 'flex',
+                alignItems: 'center',
+                gap: 20,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  position: 'relative',
+                  width: 80,
+                  height: 80,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    width: 120,
+                    height: 120,
+                    borderRadius: 60,
+                    background:
+                      'radial-gradient(circle, rgba(91, 224, 216, 0.32), rgba(65, 94, 193, 0.16) 50%, rgba(70, 58, 162, 0) 72%)',
+                  }}
+                />
+                <img
+                  src={APPICON_DATA_URL}
+                  alt=""
+                  width={80}
+                  height={80}
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 18,
+                    border: '1px solid rgba(248, 247, 253, 0.14)',
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  fontSize: 34,
+                  color: '#f8f7fd',
+                  fontWeight: 700,
+                  letterSpacing: '0.01em',
+                }}
+              >
+                EQMonitor
+              </div>
+              {label && <LabelChip label={label} />}
+            </div>
+
+            {/* Title + thumbnail */}
+            <div
+              style={{
+                display: 'flex',
+                flex: 1,
+                alignItems: 'center',
+                gap: 48,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flex: 1,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: titleFontSize(title.length, true),
+                    fontWeight: 700,
+                    color: '#f8f7fd',
+                    lineHeight: 1.3,
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {title}
+                </div>
+              </div>
+              <img
+                src={imageData ?? ''}
+                alt=""
+                width={320}
+                height={320}
+                style={{
+                  width: 320,
+                  height: 320,
+                  objectFit: 'cover',
+                  borderRadius: 20,
+                  border: '1px solid rgba(248, 247, 253, 0.14)',
+                  flexShrink: 0,
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 28,
+            }}
+          >
+            {/* Icon with glow halo */}
+            <div
+              style={{
+                display: 'flex',
+                position: 'relative',
+                width: 168,
+                height: 168,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  width: 220,
+                  height: 220,
+                  borderRadius: 110,
+                  background:
+                    'radial-gradient(circle, rgba(91, 224, 216, 0.35), rgba(65, 94, 193, 0.18) 45%, rgba(70, 58, 162, 0) 70%)',
+                }}
+              />
+              <img
+                src={APPICON_DATA_URL}
+                alt=""
+                width={168}
+                height={168}
+                style={{
+                  width: 168,
+                  height: 168,
+                  borderRadius: 38,
+                  border: '1px solid rgba(248, 247, 253, 0.12)',
+                }}
+              />
+            </div>
+
+            {/* Wordmark + optional type chip */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 18,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 44,
+                  fontWeight: 700,
+                  color: '#f8f7fd',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                EQMonitor
+              </div>
+              {label && <LabelChip label={label} />}
+            </div>
+
+            {/* Page title */}
+            <div
+              style={{
+                display: 'flex',
+                maxWidth: 980,
+                fontSize: titleFontSize(title.length, false),
                 fontWeight: 700,
-                color: '#f8f7fd',
-                lineHeight: 1.35,
+                color: '#c9cbf0',
+                lineHeight: 1.25,
+                textAlign: 'center',
                 wordBreak: 'break-word',
+                justifyContent: 'center',
               }}
             >
               {title}
             </div>
           </div>
-          {hasImage && (
-            <img
-              src={imageData!}
-              style={{
-                width: 360,
-                height: 360,
-                objectFit: 'cover',
-                borderRadius: 16,
-                border: '1px solid rgba(248, 247, 253, 0.08)',
-                flexShrink: 0,
-              }}
-            />
-          )}
-        </div>
-
-        {/* Footer */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div
-            style={{
-              fontSize: 18,
-              color: 'rgba(248, 247, 253, 0.35)',
-              fontWeight: 700,
-            }}
-          >
-            eqmonitor.app
-          </div>
-        </div>
+        )}
       </div>
     </div>,
     {
       width: 1200,
       height: 630,
       fonts: [
+        {
+          name: 'Google Sans Flex',
+          data: googleSansFlexBold as unknown as ArrayBuffer,
+          weight: 700,
+          style: 'normal',
+        },
         {
           name: 'Noto Sans JP',
           data: notoSansJPBold as unknown as ArrayBuffer,
