@@ -27,6 +27,11 @@ export function Footer() {
           </Link>
         </li>
         <li>
+          <Link to="/faq" className="hover:underline me-4 md:me-6">
+            よくある質問
+          </Link>
+        </li>
+        <li>
           <Link to="/asctl" className="hover:underline me-4 md:me-6">
             特定商取引法に基づく表記
           </Link>
