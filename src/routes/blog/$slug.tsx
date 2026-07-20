@@ -18,7 +18,7 @@ export const Route = createFileRoute('/blog/$slug')({
       ? seo({
           title: `${loaderData.title} | EQMonitor Blog`,
           description: loaderData.description,
-          image: `https://eqmonitor.app/api/og?title=${encodeURIComponent(loaderData.title)}${loaderData.image ? `&image=${encodeURIComponent(loaderData.image.startsWith('http') ? loaderData.image : `https://eqmonitor.app${loaderData.image}`)}` : ''}`,
+          image: `https://eqmonitor.app/api/og?type=blog&title=${encodeURIComponent(loaderData.title)}${loaderData.image ? `&image=${encodeURIComponent(loaderData.image.startsWith('http') ? loaderData.image : `https://eqmonitor.app${loaderData.image}`)}` : ''}`,
         })
       : [],
   }),

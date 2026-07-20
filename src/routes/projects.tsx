@@ -5,12 +5,21 @@ import { useEffect, useRef } from "react";
 import type { MilestoneInfo, ProjectItem } from "~/lib/projectsSchema";
 import { appEnv } from "~/server/env";
 import { getProjectsData } from "~/server/projects";
+import { seo } from "~/utils/seo";
 
 const loadProjectsData = createServerFn().handler(async () => {
 	return await getProjectsData(appEnv.PROJECTS_KV);
 });
 
 export const Route = createFileRoute("/projects")({
+	head: () => ({
+		meta: seo({
+			title: "開発ロードマップ | EQMonitor",
+			description:
+				"EQMonitor の開発状況・マイルストーン・予定機能を公開しています。",
+			image: `https://eqmonitor.app/api/og?type=projects&title=${encodeURIComponent("開発ロードマップ")}`,
+		}),
+	}),
 	loader: () => loadProjectsData(),
 	component: ProjectsPage,
 });
