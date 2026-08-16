@@ -38,7 +38,7 @@ export const Route = createRootRoute({
       },
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&family=Noto+Sans+JP:wght@100..900&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@300..800&family=Google+Sans+Flex:wght@100..900&family=Noto+Sans+JP:wght@100..900&display=swap',
       },
     ],
   }),

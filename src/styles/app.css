@@ -41,6 +41,7 @@
 
 @theme {
   --font-sans: "Google Sans Flex", "Noto Sans JP", sans-serif;
+  --font-code: "Google Sans Code", ui-monospace, monospace;
   --color-brand-from: #3B88E6;
   --color-brand-mid: #415EC1;
   --color-brand-to: #463AA2;
