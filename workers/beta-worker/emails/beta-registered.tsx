@@ -54,7 +54,7 @@ export function BetaRegisteredEmail() {
         <meta name="supported-color-schemes" content="dark" />
       </Head>
       <Preview>
-        EQMonitor v3 ベータプログラムへの登録が完了しました。TestFlight からの招待をお待ちください。
+        EQMonitor v3 ベータプログラムへの登録が完了しました!
       </Preview>
       <Body style={body}>
         <Container style={outer}>
@@ -110,14 +110,18 @@ export function BetaRegisteredEmail() {
               <Heading as="h2" style={subHeading}>
                 次のステップ
               </Heading>
+
+              <Text style={stepText}>
+                <span style={stepNumber}>0.</span> 現在公開されているEQMonitorをご利用の方は、一旦アンインストールしてください
+              </Text>
               <Text style={stepText}>
                 <span style={stepNumber}>1.</span> TestFlight アプリをインストール
               </Text>
               <Text style={stepText}>
-                <span style={stepNumber}>2.</span> Apple から届く招待メールを承認
+                <span style={stepNumber}>2.</span> Apple から届く招待メールからテストグループに参加
               </Text>
               <Text style={stepText}>
-                <span style={stepNumber}>3.</span> EQMonitor をインストール
+                <span style={stepNumber}>3.</span> TestFlight から EQMonitor をインストール
               </Text>
 
               <Hr style={hr} />
