@@ -7,13 +7,6 @@ import { BetaTermsModal } from './BetaTermsModal'
 const TURNSTILE_SCRIPT =
   'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
 
-const WORKFLOW_STEPS = [
-  { key: 'add-to-testflight', label: 'TestFlightに追加' },
-  { key: 'send-testflight-invitation', label: 'TestFlight招待メール送信' },
-  { key: 'update-registration-status', label: '登録ステータス更新' },
-  { key: 'send-email', label: '登録完了メール送信' },
-] as const
-
 type FormStatus = 'idle' | 'submitting' | 'polling' | 'success' | 'error'
 
 export function BetaForm({ siteKey }: { siteKey: string }) {
@@ -24,7 +17,6 @@ export function BetaForm({ siteKey }: { siteKey: string }) {
   const [showModal, setShowModal] = useState(false)
   const [status, setStatus] = useState<FormStatus>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [workflowStatus, setWorkflowStatus] = useState<string>('running')
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const pollCountRef = useRef(0)
 
@@ -75,7 +67,6 @@ export function BetaForm({ siteKey }: { siteKey: string }) {
 
   function startPolling(workflowId: string) {
     setStatus('polling')
-    setWorkflowStatus('running')
     pollCountRef.current = 0
 
     pollingRef.current = setInterval(async () => {
@@ -90,7 +81,6 @@ export function BetaForm({ siteKey }: { siteKey: string }) {
 
       try {
         const result = await getBetaStatus({ data: { workflowId } })
-        setWorkflowStatus(result.status)
 
         if (result.status === 'complete') {
           if (pollingRef.current) clearInterval(pollingRef.current)
@@ -161,24 +151,14 @@ export function BetaForm({ siteKey }: { siteKey: string }) {
 
   if (status === 'polling') {
     return (
-      <div className="max-w-md mx-auto">
-        <h2 className="text-xl font-bold mb-6">ベータプログラム登録中...</h2>
-        <ul className="steps steps-vertical w-full">
-          {WORKFLOW_STEPS.map((step) => {
-            const isComplete = workflowStatus === 'complete'
-            return (
-              <li key={step.key} className={`step ${isComplete ? 'step-primary' : ''}`}>
-                <div className="flex items-center gap-2">
-                  {isComplete ? '✅' : '⏳'}
-                  <span>{step.label}</span>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
-        <div className="flex justify-center mt-6">
-          <span className="loading loading-spinner loading-md" />
-        </div>
+      <div className="flex flex-col items-center gap-4 max-w-md mx-auto">
+        <span className="loading loading-spinner loading-lg" />
+        <h2 className="text-xl font-bold">ベータプログラム登録中...</h2>
+        <p className="text-base-content/70 text-center">
+          TestFlightへの追加と招待メールの送信を行っています。
+          <br />
+          このページを開いたままお待ちください。
+        </p>
       </div>
     )
   }
@@ -214,7 +194,6 @@ export function BetaForm({ siteKey }: { siteKey: string }) {
             className="input input-bordered w-full"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
           />
           <span className="label-text-alt mt-1 text-base-content/50">
             TestFlight の招待に使用されます
