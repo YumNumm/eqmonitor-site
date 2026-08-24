@@ -5,6 +5,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "check:well-known": "node scripts/check-well-known.mjs",
     "dev": "portless eqmonitor-site pnpm vite dev",
     "build": "vite build",
     "preview": "portless eqmonitor-site vite preview",
