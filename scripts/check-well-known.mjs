@@ -9,9 +9,10 @@ const fingerprints = [
 ];
 const wellKnownDirectory = new URL('../public/.well-known/', import.meta.url);
 
-const [aasaSource, assetLinksSource] = await Promise.all([
+const [aasaSource, assetLinksSource, headersSource] = await Promise.all([
   readFile(new URL('apple-app-site-association', wellKnownDirectory), 'utf8'),
   readFile(new URL('assetlinks.json', wellKnownDirectory), 'utf8'),
+  readFile(new URL('../_headers', wellKnownDirectory), 'utf8'),
 ]);
 const aasa = JSON.parse(aasaSource);
 const assetLinks = JSON.parse(assetLinksSource);
@@ -53,5 +54,31 @@ for (const fingerprint of fingerprints) {
     `Digital Asset Links must contain ${fingerprint}`,
   );
 }
+
+const headerRules = new Map();
+let currentPath;
+for (const line of headersSource.split('\n')) {
+  if (line.length === 0 || line.trimStart().startsWith('#')) continue;
+  if (!/^\s/.test(line)) {
+    currentPath = line.trim();
+    headerRules.set(currentPath, new Map());
+    continue;
+  }
+  const separator = line.indexOf(':');
+  assert.notEqual(separator, -1, `Invalid _headers line: ${line}`);
+  headerRules
+    .get(currentPath)
+    ?.set(
+      line.slice(0, separator).trim().toLowerCase(),
+      line.slice(separator + 1).trim(),
+    );
+}
+assert.equal(
+  headerRules
+    .get('/.well-known/apple-app-site-association')
+    ?.get('content-type'),
+  'application/json',
+  'AASA must be served as application/json',
+);
 
 console.log('Well-known association contracts verified.');
