@@ -2,40 +2,52 @@
 
 EQMonitor のランディングページ。問い合わせ・フィードバック受付機能を備える。
 
-- **Framework**: [TanStack Start](https://tanstack.com/start) (React) + Vite
-- **Styling**: Tailwind CSS v4 + daisyUI (night テーマ)
-- **Hosting**: Cloudflare Workers
-- **Storage**: Cloudflare D1 (問い合わせ格納) / KV (レート制限)
+- **Framework**: [SvelteKit](https://svelte.dev/docs/kit) (Svelte 5) + [Vite+](https://viteplus.dev/)
+- **UI**: Tailwind CSS v4 + daisyUI / [Bits UI](https://bits-ui.com/) (Dialog)
+- **Hosting**: Cloudflare Workers (`@sveltejs/adapter-cloudflare`)
+- **Storage**: Cloudflare D1 (問い合わせ・ベータ登録) / KV (開発ロードマップのキャッシュ)
 - **認証**: Cloudflare Turnstile
-- **通知/管理**: Slack (interactive button) → GitHub Issue
+- **通知/管理**: GitHub Issue
 
 ## コマンド
 
 | Command | Action |
 | :-- | :-- |
-| `pnpm dev` | ローカル開発サーバー (http://localhost:3000) |
-| `pnpm build` | 本番ビルド + 型チェック |
+| `pnpm dev` | ローカル開発サーバー (`vp dev`) |
+| `pnpm build` | 本番ビルド (`vp build`) |
+| `pnpm check` | `wrangler types` + `svelte-check` による型チェック |
+| `pnpm lint` | Oxlint (`vp lint`) |
 | `pnpm deploy` | ビルドして Cloudflare Workers へデプロイ |
 | `pnpm cf-typegen` | `wrangler.jsonc` から binding の型を生成 |
 | `pnpm db:migrate:local` | ローカル D1 にマイグレーション適用 |
 | `pnpm db:migrate:remote` | 本番 D1 にマイグレーション適用 |
 
+ビルド成果物をローカルの workerd で確認する場合:
+
+```sh
+pnpm build
+pnpm wrangler dev -c .svelte-kit/cloudflare/worker/wrangler.json --test-scheduled
+```
+
+## 構成メモ
+
+- `$lib` は Kit 3 で廃止されたため、`package.json` の `imports` で定義した `#lib/*` を使う。`.ts` モジュールは拡張子付きで import する。
+- adapter-cloudflare が生成する Worker は `fetch` しか持たないため、`adapter.ts` で `src/scheduled.ts`（開発ロードマップの同期 cron）をバンドルして `scheduled` を合成している。
+- `_headers` はプロジェクトルート、静的ファイルは `static/` に置く。
+
 ## 問い合わせ機能のアーキテクチャ
 
 ```
-[フォーム + Turnstile] --POST /api/inquiry--> [Turnstile検証 → KVレート制限 → D1保存 → Slack通知(ボタン付)]
-                                                                                          │
-[Slackボタン] --POST /api/slack/actions--> [署名検証 → GitHub Issue作成 → D1更新 → chat.update]
+[フォーム + Turnstile] --POST /api/inquiry--> [Turnstile検証 → D1保存 → GitHub Issue作成]
 ```
 
-問い合わせは Slack/GitHub への通知より先に D1 へ保存される（外部通知が失敗しても問い合わせは失われない）。
+問い合わせは GitHub への Issue 作成より先に D1 へ保存される（Issue 作成が失敗しても問い合わせは失われない）。
 
 主なソース:
-- `src/routes/contact.tsx` / `src/components/ContactForm.tsx` — フォーム UI
-- `src/routes/api/inquiry.ts` — 受信 API
-- `src/routes/api/slack.actions.ts` — Slack interactivity callback
-- `src/server/*` — turnstile / ratelimit / db / slack / github のロジック
-- `migrations/0001_init.sql` — D1 スキーマ
+- `src/routes/contact/+page.svelte` / `src/lib/components/ContactForm.svelte` — フォーム UI
+- `src/routes/api/inquiry/+server.ts` — 受信 API
+- `src/lib/server/*` — turnstile / db / github / projects のロジック
+- `migrations/` — D1 スキーマ
 
 ## 初回セットアップ
 

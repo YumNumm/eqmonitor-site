@@ -7,12 +7,12 @@ const fingerprints = [
   'F9:60:E8:2C:F4:69:F3:F3:DC:09:9D:5E:25:17:8B:9A:7E:C3:DC:FC:48:30:30:BB:EE:BE:65:CF:BC:E5:E0:9F',
   '4F:AE:CE:62:51:4A:79:D1:3F:C3:E3:D5:77:C8:CE:A1:62:EE:E1:C4:9E:6D:89:88:78:26:FA:7B:C8:78:DD:75',
 ];
-const wellKnownDirectory = new URL('../public/.well-known/', import.meta.url);
+const wellKnownDirectory = new URL('../static/.well-known/', import.meta.url);
 
 const [aasaSource, assetLinksSource, headersSource] = await Promise.all([
   readFile(new URL('apple-app-site-association', wellKnownDirectory), 'utf8'),
   readFile(new URL('assetlinks.json', wellKnownDirectory), 'utf8'),
-  readFile(new URL('../_headers', wellKnownDirectory), 'utf8'),
+  readFile(new URL('../_headers', import.meta.url), 'utf8'),
 ]);
 const aasa = JSON.parse(aasaSource);
 const assetLinks = JSON.parse(assetLinksSource);

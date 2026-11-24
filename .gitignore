@@ -1,11 +1,8 @@
 # build output
 dist/
-.output/
-.nitro/
-.tanstack/
+.svelte-kit/
 
 # generated
-src/routeTree.gen.ts
 worker-configuration.d.ts
 
 # wrangler / cloudflare

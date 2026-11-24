@@ -5,7 +5,6 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
-	"main": "src/server/server-entry.ts",
 	"vars": {
 		"TURNSTILE_SITE_KEY": "0x4AAAAAADXHIKnSew1W7HAw",
 		"GITHUB_OWNER": "YumNumm",
