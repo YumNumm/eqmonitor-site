@@ -1,0 +1,83 @@
+amends "package://github.com/jdx/hk/releases/download/v2.13.0/hk@2.13.0#/Config.pkl"
+
+local utilFileGlobs = List("**/*")
+local workflowGlobs = List(".github/workflows/**/*.yml", ".github/workflows/**/*.yaml")
+local webGlobs = List(
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.mjs",
+    "**/*.svelte",
+    "**/*.css",
+    "**/*.json",
+    "**/*.jsonc",
+    "**/*.md"
+)
+local lintGlobs = List("**/*.ts", "**/*.tsx", "**/*.js", "**/*.mjs", "**/*.svelte")
+
+local linters = new Mapping<String, Step> {
+    ["util-check-merge-conflict"] {
+        glob = utilFileGlobs
+        check = "mise exec -- hk util check-merge-conflict --assume-in-merge {{files}}"
+    }
+    ["util-check-symlinks"] {
+        glob = utilFileGlobs
+        allow_symlinks = true
+        check = "mise exec -- hk util check-symlinks {{files}}"
+    }
+    ["util-detect-private-key"] {
+        glob = utilFileGlobs
+        check = "mise exec -- hk util detect-private-key {{files}}"
+    }
+    ["gitleaks"] {
+        // gitleaks は色付きの diff を解析できないため、Git の色出力を止める
+        env {
+            ["GIT_CONFIG_COUNT"] = "2"
+            ["GIT_CONFIG_KEY_0"] = "color.ui"
+            ["GIT_CONFIG_VALUE_0"] = "never"
+            ["GIT_CONFIG_KEY_1"] = "color.diff"
+            ["GIT_CONFIG_VALUE_1"] = "never"
+        }
+        check = "mise exec -- gitleaks git --staged --redact=100 --baseline-path .gitleaks.baseline.json"
+    }
+    ["actionlint"] {
+        glob = workflowGlobs
+        check = "mise exec -- actionlint {{files}}"
+    }
+    ["ghalint"] {
+        glob = workflowGlobs
+        check = "mise exec -- ghalint run"
+    }
+    ["pinact"] {
+        glob = workflowGlobs
+        check = "mise exec -- pinact run --fix=false --no-api {{files}}"
+    }
+    ["zizmor"] {
+        glob = workflowGlobs
+        check = "mise exec -- zizmor {{files}}"
+    }
+    ["vp-fmt"] {
+        glob = webGlobs
+        check = "mise exec -- pnpm exec vp fmt --check {{files}}"
+        fix = "mise exec -- pnpm exec vp fmt {{files}}"
+    }
+    ["vp-lint"] {
+        glob = lintGlobs
+        check = "mise exec -- pnpm exec vp lint {{files}}"
+        fix = "mise exec -- pnpm exec vp lint --fix {{files}}"
+    }
+}
+
+hooks {
+    ["pre-commit"] {
+        fix = false
+        stash = "git"
+        steps = linters
+    }
+    ["check"] {
+        steps = linters
+    }
+    ["fix"] {
+        steps = linters
+    }
+}
