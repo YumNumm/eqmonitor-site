@@ -30,9 +30,7 @@
       <p class="text-center text-base-content/50 py-16">FAQはありません</p>
     {:else}
       {#each data.sections as section (section.id)}
-        <section
-          class="collapse collapse-arrow bg-base-100 border border-base-300"
-        >
+        <section id={section.id} class="collapse collapse-arrow bg-base-100 border border-base-300">
           <input
             type="checkbox"
             use:hashCollapse={{
@@ -52,9 +50,7 @@
           <div class="collapse-content">
             <div class="space-y-3 pt-1">
               {#each section.items as item (item.id)}
-                <div
-                  class="collapse collapse-arrow bg-base-200/60 border border-base-300"
-                >
+                <div id={item.id} class="collapse collapse-arrow bg-base-200/60 border border-base-300">
                   <input
                     type="checkbox"
                     use:hashCollapse={{

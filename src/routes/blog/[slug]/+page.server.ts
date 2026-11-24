@@ -1,6 +1,12 @@
 import { error } from '@sveltejs/kit'
-import { getPostBySlug } from '#lib/server/blog.ts'
-import type { PageServerLoad } from './$types'
+import { getAllPosts, getPostBySlug } from '#lib/server/blog.ts'
+import type { EntryGenerator, PageServerLoad } from './$types'
+
+export const prerender = 'auto'
+
+export const entries: EntryGenerator = () => {
+  return getAllPosts().map((post) => ({ slug: post.slug }))
+}
 
 export const load: PageServerLoad = async ({ params }) => {
   const post = await getPostBySlug(params.slug)
