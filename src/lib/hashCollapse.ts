@@ -1,3 +1,5 @@
+import { replaceState } from '$app/navigation'
+import { page } from '$app/state'
 import type { Action } from 'svelte/action'
 
 interface HashCollapseParams {
@@ -30,9 +32,7 @@ export const hashCollapse: Action<HTMLInputElement, HashCollapseParams> = (check
 }
 
 export function updateHash(id: string, isOpen: boolean) {
-  if (isOpen) {
-    window.history.replaceState(null, '', `#${id}`)
-    return
-  }
-  window.history.replaceState(null, '', window.location.pathname + window.location.search)
+  const url = new URL(window.location.href)
+  url.hash = isOpen ? id : ''
+  replaceState(url, page.state)
 }
