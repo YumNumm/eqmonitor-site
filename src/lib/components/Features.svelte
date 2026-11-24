@@ -35,8 +35,7 @@
 
 <Container>
   <section aria-labelledby="features-heading" class="pb-12">
-    <h2 id="features-heading" class="text-3xl font-bold text-center mb-2">主な機能</h2>
-    <p class="text-center text-base-content/70 mb-8">地震に関する情報を、ひとつのアプリで。</p>
+    <h2 id="features-heading" class="text-3xl font-bold text-center mb-8">主な機能</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {#each features as feature (feature.title)}
         <article class="card flex-row items-start sm:flex-col sm:items-stretch bg-base-200/50 border border-base-300">
