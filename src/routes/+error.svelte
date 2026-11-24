@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/state'
+  import { page } from '$app/state';
 </script>
 
 <svelte:head>
@@ -7,9 +7,15 @@
 </svelte:head>
 
 {#if page.status === 404}
-  <div class="p-12 flex flex-col items-center gap-6 text-center max-w-xl mx-auto w-full">
-    <h1 class="font-code text-5xl md:text-6xl font-bold tracking-tight">404 Not Found</h1>
-    <p class="text-base-content/70">お探しのページは存在しないか、移動した可能性があります。</p>
+  <div
+    class="mx-auto flex w-full max-w-xl flex-col items-center gap-6 p-12 text-center"
+  >
+    <h1 class="font-code text-5xl font-bold tracking-tight md:text-6xl">
+      404 Not Found
+    </h1>
+    <p class="text-base-content/70">
+      お探しのページは存在しないか、移動した可能性があります。
+    </p>
     <iframe
       data-testid="embed-iframe"
       style="border-radius: 12px"
@@ -25,7 +31,7 @@
     <a href="/" class="btn btn-primary">トップへ戻る</a>
   </div>
 {:else}
-  <div class="p-12 flex flex-col items-center gap-4 text-center">
+  <div class="flex flex-col items-center gap-4 p-12 text-center">
     <h1 class="text-3xl font-bold">エラーが発生しました</h1>
     <p class="text-base-content/70">{page.error?.message}</p>
     <a href="/" class="btn btn-primary">トップへ戻る</a>

@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Body,
   Button,
@@ -12,7 +11,8 @@ import {
   Preview,
   Section,
   Text,
-} from '@react-email/components'
+} from '@react-email/components';
+import React from 'react';
 
 /**
  * ベータプログラム登録完了メール。
@@ -25,7 +25,7 @@ import {
 // ランタイムで置換されるプレースホルダ。
 // JSX のテキストノードに `{{...}}` を直接書くとオブジェクト式と解釈されるため、
 // 文字列リテラルとして埋め込む。
-const GREETING = '{{GREETING}}'
+const GREETING = '{{GREETING}}';
 
 // サイトのデザイントークン (src/styles/app.css の eqmonitor テーマ) に合わせる。
 const colors = {
@@ -38,37 +38,35 @@ const colors = {
   brandMid: '#415EC1',
   brandTo: '#463AA2',
   accent: '#5be0d8',
-}
+};
 
 const fontFamily =
-  "'Google Sans Flex', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Segoe UI', sans-serif"
+  "'Google Sans Flex', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Segoe UI', sans-serif";
 
-const SITE_URL = 'https://eqmonitor.app'
-const TESTFLIGHT_URL = 'https://apps.apple.com/app/testflight/id899247664'
+const SITE_URL = 'https://eqmonitor.app';
+const TESTFLIGHT_URL = 'https://apps.apple.com/app/testflight/id899247664';
 
 export function BetaRegisteredEmail() {
   return (
-    <Html lang="ja">
+    <Html lang='ja'>
       <Head>
-        <meta name="color-scheme" content="dark" />
-        <meta name="supported-color-schemes" content="dark" />
+        <meta name='color-scheme' content='dark' />
+        <meta name='supported-color-schemes' content='dark' />
       </Head>
-      <Preview>
-        EQMonitor v3 ベータプログラムへの登録が完了しました!
-      </Preview>
+      <Preview>EQMonitor v3 ベータプログラムへの登録が完了しました!</Preview>
       <Body style={body}>
         <Container style={outer}>
           {/* ブランドヘッダー */}
           <Section style={header}>
-            <table cellPadding={0} cellSpacing={0} role="presentation">
+            <table cellPadding={0} cellSpacing={0} role='presentation'>
               <tbody>
                 <tr>
                   <td style={{ paddingRight: '12px', verticalAlign: 'middle' }}>
                     <Img
                       src={`${SITE_URL}/favicon.webp`}
-                      width="40"
-                      height="40"
-                      alt="EQMonitor"
+                      width='40'
+                      height='40'
+                      alt='EQMonitor'
                       style={{ borderRadius: '10px', display: 'block' }}
                     />
                   </td>
@@ -95,8 +93,9 @@ export function BetaRegisteredEmail() {
               </Text>
 
               <Text style={paragraph}>
-                まもなく Apple から TestFlight の招待メールが届きます。下のボタンから
-                TestFlight アプリをインストールのうえ、招待を承認してベータ版の利用を開始してください。
+                まもなく Apple から TestFlight
+                の招待メールが届きます。下のボタンから TestFlight
+                アプリをインストールのうえ、招待を承認してベータ版の利用を開始してください。
               </Text>
 
               <Section style={{ textAlign: 'center', margin: '32px 0' }}>
@@ -107,21 +106,25 @@ export function BetaRegisteredEmail() {
 
               <Hr style={hr} />
 
-              <Heading as="h2" style={subHeading}>
+              <Heading as='h2' style={subHeading}>
                 次のステップ
               </Heading>
 
               <Text style={stepText}>
-                <span style={stepNumber}>0.</span> 現在公開されているEQMonitorをご利用の方は、一旦アンインストールしてください
+                <span style={stepNumber}>0.</span>{' '}
+                現在公開されているEQMonitorをご利用の方は、一旦アンインストールしてください
               </Text>
               <Text style={stepText}>
-                <span style={stepNumber}>1.</span> TestFlight アプリをインストール
+                <span style={stepNumber}>1.</span> TestFlight
+                アプリをインストール
               </Text>
               <Text style={stepText}>
-                <span style={stepNumber}>2.</span> Apple から届く招待メールからテストグループに参加
+                <span style={stepNumber}>2.</span> Apple
+                から届く招待メールからテストグループに参加
               </Text>
               <Text style={stepText}>
-                <span style={stepNumber}>3.</span> TestFlight から EQMonitor をインストール
+                <span style={stepNumber}>3.</span> TestFlight から EQMonitor
+                をインストール
               </Text>
 
               <Hr style={hr} />
@@ -153,7 +156,7 @@ export function BetaRegisteredEmail() {
             </Text>
             <Text style={footerCredit}>
               EQMonitor is developed by{' '}
-              <Link href="https://github.com/YumNumm" style={footerLink}>
+              <Link href='https://github.com/YumNumm' style={footerLink}>
                 Ryotaro Onoue (aka. もぐもぐ)
               </Link>
             </Text>
@@ -161,10 +164,10 @@ export function BetaRegisteredEmail() {
         </Container>
       </Body>
     </Html>
-  )
+  );
 }
 
-export default BetaRegisteredEmail
+export default BetaRegisteredEmail;
 
 /* -------------------------------------------------------------------------- */
 /* Styles                                                                      */
@@ -176,18 +179,18 @@ const body: React.CSSProperties = {
   backgroundColor: colors.base100,
   color: colors.baseContent,
   fontFamily,
-}
+};
 
 const outer: React.CSSProperties = {
   width: '100%',
   maxWidth: '560px',
   margin: '0 auto',
   padding: '0 16px',
-}
+};
 
 const header: React.CSSProperties = {
   padding: '8px 4px 24px',
-}
+};
 
 const brandWordmark: React.CSSProperties = {
   margin: 0,
@@ -195,18 +198,18 @@ const brandWordmark: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.01em',
   color: colors.baseContent,
-}
+};
 
 const card: React.CSSProperties = {
   backgroundColor: colors.base200,
   border: `1px solid ${colors.base300}`,
   borderRadius: '16px',
   overflow: 'hidden',
-}
+};
 
 const cardInner: React.CSSProperties = {
   padding: '32px',
-}
+};
 
 const heading: React.CSSProperties = {
   margin: '0 0 20px',
@@ -214,21 +217,21 @@ const heading: React.CSSProperties = {
   lineHeight: 1.4,
   fontWeight: 700,
   color: colors.baseContent,
-}
+};
 
 const subHeading: React.CSSProperties = {
   margin: '0 0 12px',
   fontSize: '15px',
   fontWeight: 700,
   color: colors.accent,
-}
+};
 
 const paragraph: React.CSSProperties = {
   margin: '0 0 16px',
   fontSize: '15px',
   lineHeight: 1.8,
   color: colors.baseContent,
-}
+};
 
 const primaryButton: React.CSSProperties = {
   display: 'inline-block',
@@ -241,63 +244,63 @@ const primaryButton: React.CSSProperties = {
   fontWeight: 600,
   textDecoration: 'none',
   letterSpacing: '0.01em',
-}
+};
 
 const hr: React.CSSProperties = {
   margin: '28px 0',
   border: 'none',
   borderTop: `1px solid ${colors.base300}`,
-}
+};
 
 const stepText: React.CSSProperties = {
   margin: '0 0 10px',
   fontSize: '15px',
   lineHeight: 1.6,
   color: colors.baseContent,
-}
+};
 
 const stepNumber: React.CSSProperties = {
   display: 'inline-block',
   width: '22px',
   color: colors.accent,
   fontWeight: 700,
-}
+};
 
 const noteText: React.CSSProperties = {
   margin: 0,
   fontSize: '13px',
   lineHeight: 1.7,
   color: 'rgba(248, 247, 253, 0.6)',
-}
+};
 
 const inlineLink: React.CSSProperties = {
   color: colors.accent,
   textDecoration: 'underline',
-}
+};
 
 const footer: React.CSSProperties = {
   padding: '24px 8px 8px',
   textAlign: 'center',
-}
+};
 
 const footerLinks: React.CSSProperties = {
   margin: '0 0 8px',
   fontSize: '12px',
   color: 'rgba(248, 247, 253, 0.6)',
-}
+};
 
 const footerLink: React.CSSProperties = {
   color: 'rgba(248, 247, 253, 0.6)',
   textDecoration: 'none',
-}
+};
 
 const footerSep: React.CSSProperties = {
   margin: '0 8px',
   color: 'rgba(248, 247, 253, 0.3)',
-}
+};
 
 const footerCredit: React.CSSProperties = {
   margin: 0,
   fontSize: '12px',
   color: 'rgba(248, 247, 253, 0.45)',
-}
+};

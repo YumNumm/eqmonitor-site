@@ -1,4 +1,4 @@
-import * as v from 'valibot'
+import * as v from 'valibot';
 
 /**
  * 問い合わせフォームのユーザー入力スキーマ。
@@ -30,6 +30,6 @@ export const ContactFormSchema = v.object({
     v.minLength(1, '本文を入力してください'),
     v.maxLength(5000, '本文が長すぎます'),
   ),
-})
+});
 
-export type ContactFormInput = v.InferInput<typeof ContactFormSchema>
+export type ContactFormInput = v.InferInput<typeof ContactFormSchema>;

@@ -1,41 +1,39 @@
+import type { WorkflowEvent, WorkflowStep } from 'cloudflare:workers';
 
-import { WorkflowEntrypoint, WorkflowStep, type WorkflowEvent } from 'cloudflare:workers';
-import { app } from './app'
+import { WorkflowEntrypoint } from 'cloudflare:workers';
+
+import { app } from './app';
 import {
   addBetaTester,
   getBetaGroupAppId,
   sendBetaTesterInvitation,
-} from './asc-api'
-import { betaRegisteredHtml } from './emails/beta-registered'
-
+} from './asc-api';
+import { betaRegisteredHtml } from './emails/beta-registered';
 
 function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 interface BetaRegistrationParams {
-  registrationId: string
-  email: string
-  firstName?: string
-  lastName?: string
-  betaGroupId: string
+  registrationId: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  betaGroupId: string;
 }
 
 export class BetaRegistrationWorkflow extends WorkflowEntrypoint<
   Cloudflare.Env,
   BetaRegistrationParams
 > {
-  async run(
-    event: WorkflowEvent<BetaRegistrationParams>,
-    step: WorkflowStep,
-  ) {
+  async run(event: WorkflowEvent<BetaRegistrationParams>, step: WorkflowStep) {
     const { registrationId, email, firstName, lastName, betaGroupId } =
-      event.payload
+      event.payload;
 
     const result = await step.do(
       'add-to-testflight',
@@ -48,9 +46,9 @@ export class BetaRegistrationWorkflow extends WorkflowEntrypoint<
           firstName,
           lastName,
           betaGroupId,
-        })
+        });
       },
-    )
+    );
 
     await step.do(
       'send-testflight-invitation',
@@ -58,13 +56,13 @@ export class BetaRegistrationWorkflow extends WorkflowEntrypoint<
         retries: { limit: 3, delay: '5 seconds', backoff: 'linear' },
       },
       async () => {
-        const appId = await getBetaGroupAppId(this.env, betaGroupId)
+        const appId = await getBetaGroupAppId(this.env, betaGroupId);
         await sendBetaTesterInvitation(this.env, {
           appId,
           testerId: result.testerId,
-        })
+        });
       },
-    )
+    );
 
     await step.do('update-registration-status', async () => {
       await this.env.DB.prepare(
@@ -73,13 +71,16 @@ export class BetaRegistrationWorkflow extends WorkflowEntrypoint<
          WHERE id = ?`,
       )
         .bind(new Date().toISOString(), registrationId)
-        .run()
-    })
+        .run();
+    });
 
     await step.do('send-email', async () => {
-      const displayName = [lastName, firstName].filter(Boolean).join(' ').trim()
-      const greeting = displayName ? `${escapeHtml(displayName)} さん` : ''
-      const html = betaRegisteredHtml.replace('{{GREETING}}', greeting)
+      const displayName = [lastName, firstName]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+      const greeting = displayName ? `${escapeHtml(displayName)} さん` : '';
+      const html = betaRegisteredHtml.replace('{{GREETING}}', greeting);
 
       await this.env.EMAIL.send({
         to: email,
@@ -88,12 +89,12 @@ export class BetaRegistrationWorkflow extends WorkflowEntrypoint<
         subject: 'EQMonitor v3 ベータプログラムへの登録が完了しました',
         cc: 'support@eqmonitor.app',
         html,
-      })
-    })
+      });
+    });
 
-    return { testerId: result.testerId }
+    return { testerId: result.testerId };
   }
 }
 
-export type { AppType } from './app'
-export default app
+export type { AppType } from './app';
+export default app;

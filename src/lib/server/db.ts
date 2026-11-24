@@ -1,23 +1,23 @@
-export type InquiryType = 'inquiry' | 'feedback' | 'bug'
-export type InquiryStatus = 'new' | 'issue_created'
+export type InquiryType = 'inquiry' | 'feedback' | 'bug';
+export type InquiryStatus = 'new' | 'issue_created';
 
 export interface Inquiry {
-  id: string
-  created_at: string
-  type: InquiryType
-  name: string
-  email: string
-  subject: string
-  message: string
-  app_version: string | null
-  platform: string | null
-  user_agent: string | null
-  device_info: string | null
-  status: InquiryStatus
-  github_issue_number: number | null
+  id: string;
+  created_at: string;
+  type: InquiryType;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  app_version: string | null;
+  platform: string | null;
+  user_agent: string | null;
+  device_info: string | null;
+  status: InquiryStatus;
+  github_issue_number: number | null;
 }
 
-export type NewInquiry = Omit<Inquiry, 'status' | 'github_issue_number'>
+export type NewInquiry = Omit<Inquiry, 'status' | 'github_issue_number'>;
 
 export async function insertInquiry(
   db: D1Database,
@@ -42,7 +42,7 @@ export async function insertInquiry(
       inquiry.user_agent,
       inquiry.device_info,
     )
-    .run()
+    .run();
 }
 
 export async function getInquiry(
@@ -52,7 +52,7 @@ export async function getInquiry(
   return await db
     .prepare('SELECT * FROM inquiries WHERE id = ?')
     .bind(id)
-    .first<Inquiry>()
+    .first<Inquiry>();
 }
 
 export async function markIssueCreated(
@@ -65,5 +65,5 @@ export async function markIssueCreated(
       `UPDATE inquiries SET status = 'issue_created', github_issue_number = ? WHERE id = ?`,
     )
     .bind(issueNumber, id)
-    .run()
+    .run();
 }

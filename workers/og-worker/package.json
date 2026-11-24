@@ -1,8 +1,8 @@
 {
   "name": "eqmonitor-og-worker",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "version": "0.0.1",
   "exports": {
     ".": {
       "types": "./src/index.ts"
@@ -14,9 +14,9 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.0",
     "hono": "^4.7.0",
-    "satori": "^0.12.0",
-    "@resvg/resvg-wasm": "^2.6.0"
+    "satori": "^0.12.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250525.0",

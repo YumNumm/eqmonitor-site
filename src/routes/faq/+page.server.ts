@@ -1,8 +1,9 @@
-import { getAllRenderedFaqSections } from '#lib/server/faq.ts'
-import type { PageServerLoad } from './$types'
+import type { PageServerLoad } from './$types';
 
-export const prerender = true
+import { getAllRenderedFaqSections } from '#lib/server/faq.ts';
+
+export const prerender = true;
 
 export const load: PageServerLoad = async () => {
-  return { sections: await getAllRenderedFaqSections() }
-}
+  return { sections: await getAllRenderedFaqSections() };
+};

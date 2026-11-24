@@ -1,5 +1,6 @@
-import type { AppEnv } from './lib/server/env'
-import { fetchAndStoreProjects } from './lib/server/projects'
+import type { AppEnv } from './lib/server/env';
+
+import { fetchAndStoreProjects } from './lib/server/projects';
 
 export async function scheduled(
   _event: ScheduledController,
@@ -7,8 +8,8 @@ export async function scheduled(
   ctx: ExecutionContext,
 ): Promise<void> {
   ctx.waitUntil(
-    fetchAndStoreProjects(env).catch((err) => {
-      console.error('Failed to fetch projects:', err)
+    fetchAndStoreProjects(env).catch((error: unknown) => {
+      console.error('Failed to fetch projects:', error);
     }),
-  )
+  );
 }

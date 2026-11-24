@@ -1,20 +1,10 @@
 {
   "extends": "$app/tsconfig",
-  "include": [
-    "src",
-    "*",
-    "worker-configuration.d.ts"
-  ],
-  "exclude": [
-    "src/service-worker",
-    "workers"
-  ],
+  "include": ["src", "*", "worker-configuration.d.ts"],
+  "exclude": ["src/service-worker", "workers"],
   "compilerOptions": {
     "strict": true,
     "checkJs": true,
-    "types": [
-      "$app/types",
-      "node"
-    ]
+    "types": ["$app/types", "node"]
   }
 }

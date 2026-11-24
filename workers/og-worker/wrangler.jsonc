@@ -5,14 +5,14 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "workers_dev": false,
   "rules": [
     {
       "type": "Data",
       "globs": ["**/*.ttf", "**/*.png"],
-      "fallthrough": true
-    }
-  ]
+      "fallthrough": true,
+    },
+  ],
 }

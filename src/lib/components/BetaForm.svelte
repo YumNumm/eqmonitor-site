@@ -1,68 +1,74 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte'
-  import * as v from 'valibot'
-  import { BetaRegistrationFormSchema } from '#lib/betaSchema.ts'
-  import type { BetaStatus, RegisterResult } from '#lib/betaTypes.ts'
-  import Turnstile from './Turnstile.svelte'
-  import BetaTermsModal from './BetaTermsModal.svelte'
+  import type { BetaStatus, RegisterResult } from '#lib/betaTypes.ts';
 
-  type FormStatus = 'idle' | 'submitting' | 'polling' | 'success' | 'error'
+  import { onDestroy } from 'svelte';
+  import * as v from 'valibot';
 
-  let { siteKey }: { siteKey: string } = $props()
+  import { BetaRegistrationFormSchema } from '#lib/betaSchema.ts';
 
-  let turnstile = $state<Turnstile>()
-  let token = $state('')
-  let email = $state('')
-  let showModal = $state(false)
-  let status = $state<FormStatus>('idle')
-  let errorMsg = $state('')
-  let polling: ReturnType<typeof setInterval> | null = null
-  let pollCount = 0
+  import BetaTermsModal from './BetaTermsModal.svelte';
+  import Turnstile from './Turnstile.svelte';
+
+  type FormStatus = 'idle' | 'submitting' | 'polling' | 'success' | 'error';
+
+  let { siteKey }: { siteKey: string } = $props();
+
+  let turnstile = $state<Turnstile>();
+  let token = $state('');
+  let email = $state('');
+  let showModal = $state(false);
+  let status = $state<FormStatus>('idle');
+  let errorMsg = $state('');
+  let polling: ReturnType<typeof setInterval> | null = null;
+  let pollCount = 0;
 
   function stopPolling() {
-    if (polling) clearInterval(polling)
-    polling = null
+    if (polling) clearInterval(polling);
+    polling = null;
   }
 
-  onDestroy(stopPolling)
+  onDestroy(stopPolling);
 
   function startPolling(workflowId: string) {
-    status = 'polling'
-    pollCount = 0
+    status = 'polling';
+    pollCount = 0;
 
     polling = setInterval(async () => {
-      pollCount++
+      pollCount++;
 
       if (pollCount > 30) {
-        stopPolling()
-        errorMsg = 'タイムアウトしました。しばらく経ってからメールをご確認ください。'
-        status = 'error'
-        return
+        stopPolling();
+        errorMsg =
+          'タイムアウトしました。しばらく経ってからメールをご確認ください。';
+        status = 'error';
+        return;
       }
 
       try {
-        const res = await fetch(`/api/beta/status/${encodeURIComponent(workflowId)}`)
-        if (!res.ok) throw new Error(String(res.status))
-        const result = (await res.json()) as BetaStatus
+        const res = await fetch(
+          `/api/beta/status/${encodeURIComponent(workflowId)}`,
+        );
+        if (!res.ok) throw new Error(String(res.status));
+        const result = (await res.json()) as BetaStatus;
 
         if (result.status === 'complete') {
-          stopPolling()
-          status = 'success'
+          stopPolling();
+          status = 'success';
         } else if (result.status === 'errored') {
-          stopPolling()
-          const errorDetail = result.error
+          stopPolling();
+          const errorDetail = result.error;
           errorMsg =
             typeof errorDetail === 'string'
               ? errorDetail
-              : (errorDetail?.message ?? '登録処理中にエラーが発生しました。')
-          status = 'error'
+              : (errorDetail?.message ?? '登録処理中にエラーが発生しました。');
+          status = 'error';
         }
       } catch {
-        stopPolling()
-        errorMsg = 'ステータスの取得に失敗しました。'
-        status = 'error'
+        stopPolling();
+        errorMsg = 'ステータスの取得に失敗しました。';
+        status = 'error';
       }
-    }, 2000)
+    }, 2000);
   }
 
   function handleNext() {
@@ -70,68 +76,71 @@
       platform: 'ios',
       email,
       turnstileToken: token,
-    })
+    });
     if (!validated.success) {
-      errorMsg = validated.issues[0].message
-      status = 'error'
-      return
+      errorMsg = validated.issues[0].message;
+      status = 'error';
+      return;
     }
-    errorMsg = ''
-    showModal = true
+    errorMsg = '';
+    showModal = true;
   }
 
   async function handleConfirm() {
-    status = 'submitting'
-    errorMsg = ''
-    showModal = false
+    status = 'submitting';
+    errorMsg = '';
+    showModal = false;
     try {
       const res = await fetch('/api/beta/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform: 'ios', email, turnstileToken: token }),
-      })
-      if (!res.ok) throw new Error(String(res.status))
-      const result = (await res.json()) as RegisterResult
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const result = (await res.json()) as RegisterResult;
       if (result.ok) {
-        startPolling(result.workflowId)
+        startPolling(result.workflowId);
       } else {
         if (result.error === 'already_registered') {
-          errorMsg = '既にベータプログラムに登録されています。'
+          errorMsg = '既にベータプログラムに登録されています。';
         } else if (result.error === 'turnstile_failed') {
-          errorMsg = '認証に失敗しました。もう一度お試しください。'
+          errorMsg = '認証に失敗しました。もう一度お試しください。';
         } else {
-          errorMsg = '登録に失敗しました。時間をおいて再度お試しください。'
+          errorMsg = '登録に失敗しました。時間をおいて再度お試しください。';
         }
-        status = 'error'
+        status = 'error';
       }
     } catch {
-      errorMsg = '通信エラーが発生しました。'
-      status = 'error'
+      errorMsg = '通信エラーが発生しました。';
+      status = 'error';
     } finally {
-      turnstile?.reset()
+      turnstile?.reset();
     }
   }
 </script>
 
 {#if status === 'polling'}
-  <div class="flex flex-col items-center gap-4 max-w-md mx-auto">
-    <span class="loading loading-spinner loading-lg"></span>
+  <div class="mx-auto flex max-w-md flex-col items-center gap-4">
+    <span class="loading loading-lg loading-spinner"></span>
     <h2 class="text-xl font-bold">ベータプログラム登録中...</h2>
-    <p class="text-base-content/70 text-center">
+    <p class="text-center text-base-content/70">
       TestFlightへの追加と招待メールの送信を行っています。
       <br />
       このページを開いたままお待ちください。
     </p>
   </div>
 {:else if status === 'success'}
-  <div class="alert alert-success max-w-md mx-auto">
-    <span>ベータプログラムへの登録が完了しました。TestFlight の招待メールをご確認ください。</span>
+  <div class="mx-auto alert max-w-md alert-success">
+    <span
+      >ベータプログラムへの登録が完了しました。TestFlight
+      の招待メールをご確認ください。</span
+    >
   </div>
 {:else}
-  <div class="flex flex-col gap-4 max-w-md mx-auto">
+  <div class="mx-auto flex max-w-md flex-col gap-4">
     <label class="form-control w-full">
       <span class="label-text mb-1">プラットフォーム</span>
-      <select class="select select-bordered w-full" disabled>
+      <select class="select-bordered select w-full" disabled>
         <option value="ios">iOS</option>
         <option value="android" disabled>Android（近日対応予定）</option>
       </select>
@@ -139,8 +148,14 @@
 
     <label class="form-control w-full">
       <span class="label-text mb-1">メールアドレス</span>
-      <input type="email" class="input input-bordered w-full" bind:value={email} />
-      <span class="label-text-alt mt-1 text-base-content/50">TestFlight の招待に使用されます</span>
+      <input
+        type="email"
+        class="input-bordered input w-full"
+        bind:value={email}
+      />
+      <span class="label-text-alt mt-1 text-base-content/50"
+        >TestFlight の招待に使用されます</span
+      >
     </label>
 
     <Turnstile bind:this={turnstile} {siteKey} bind:token />
@@ -161,5 +176,9 @@
     </button>
   </div>
 
-  <BetaTermsModal bind:open={showModal} onConfirm={handleConfirm} submitting={status === 'submitting'} />
+  <BetaTermsModal
+    bind:open={showModal}
+    onConfirm={handleConfirm}
+    submitting={status === 'submitting'}
+  />
 {/if}

@@ -1,19 +1,24 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import cloudflare from '@sveltejs/adapter-cloudflare'
-import type { Adapter } from '@sveltejs/kit'
-import { build } from 'vite'
+import type { Adapter } from '@sveltejs/kit';
+
+import fs from 'node:fs';
+import path from 'node:path';
+
+import cloudflare from '@sveltejs/adapter-cloudflare';
+import { build } from 'vite';
 
 // adapter-cloudflare が生成する Worker は fetch しか export しないため、
 // projects 同期用の scheduled ハンドラを別途バンドルして合成する
 export function adapter(): Adapter {
-  const base = cloudflare()
+  const base = cloudflare();
   return {
     ...base,
     async adapt(builder) {
-      await base.adapt(builder)
+      await base.adapt(builder);
 
-      const workerDir = path.join(builder.getBuildDirectory('cloudflare'), 'worker')
+      const workerDir = path.join(
+        builder.getBuildDirectory('cloudflare'),
+        'worker',
+      );
       await build({
         configFile: false,
         logLevel: 'warn',
@@ -28,9 +33,12 @@ export function adapter(): Adapter {
             output: { entryFileNames: 'index.js' },
           },
         },
-      })
+      });
 
-      fs.renameSync(path.join(workerDir, 'index.js'), path.join(workerDir, 'sveltekit.js'))
+      fs.renameSync(
+        path.join(workerDir, 'index.js'),
+        path.join(workerDir, 'sveltekit.js'),
+      );
       fs.writeFileSync(
         path.join(workerDir, 'index.js'),
         [
@@ -39,7 +47,7 @@ export function adapter(): Adapter {
           'export default { ...app, scheduled }',
           '',
         ].join('\n'),
-      )
+      );
     },
-  }
+  };
 }

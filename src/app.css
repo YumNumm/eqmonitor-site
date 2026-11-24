@@ -1,11 +1,11 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui" {
   themes: false;
 }
 @plugin "@tailwindcss/typography";
 
 @plugin "daisyui/theme" {
-  name: "eqmonitor";
+  name: 'eqmonitor';
   default: true;
   color-scheme: dark;
 
@@ -14,7 +14,7 @@
   --color-base-300: #232a40;
   --color-base-content: #f8f7fd;
 
-  --color-primary: #415EC1;
+  --color-primary: #415ec1;
   --color-primary-content: #f8f7fd;
   --color-secondary: #c9cbf0;
   --color-secondary-content: #161a2c;
@@ -40,11 +40,11 @@
 }
 
 @theme {
-  --font-sans: "Google Sans Flex", "Noto Sans JP", sans-serif;
-  --font-code: "Google Sans Code", ui-monospace, monospace;
-  --color-brand-from: #3B88E6;
-  --color-brand-mid: #415EC1;
-  --color-brand-to: #463AA2;
+  --font-sans: 'Google Sans Flex', 'Noto Sans JP', sans-serif;
+  --font-code: 'Google Sans Code', ui-monospace, monospace;
+  --color-brand-from: #3b88e6;
+  --color-brand-mid: #415ec1;
+  --color-brand-to: #463aa2;
 }
 
 html,
@@ -129,7 +129,8 @@ body {
   color: var(--color-primary-content);
   box-shadow:
     0 1px 2px rgb(0 0 0 / 0.3),
-    0 6px 20px -8px color-mix(in oklab, var(--color-brand-from) 80%, transparent);
+    0 6px 20px -8px
+      color-mix(in oklab, var(--color-brand-from) 80%, transparent);
 }
 
 .btn-primary:hover {
@@ -145,7 +146,8 @@ body {
     color-mix(in oklab, var(--color-neutral) 92%, white 8%),
     var(--color-neutral)
   );
-  border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  border: 1px solid
+    color-mix(in oklab, var(--color-base-content) 12%, transparent);
   box-shadow:
     0 1px 2px rgb(0 0 0 / 0.3),
     0 8px 24px -12px rgb(0 0 0 / 0.6);
@@ -157,7 +159,11 @@ body {
 }
 
 .btn-ghost:hover {
-  background-color: color-mix(in oklab, var(--color-base-content) 8%, transparent);
+  background-color: color-mix(
+    in oklab,
+    var(--color-base-content) 8%,
+    transparent
+  );
   box-shadow: none;
 }
 

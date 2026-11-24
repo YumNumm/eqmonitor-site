@@ -1,24 +1,42 @@
-import * as v from 'valibot'
-import type { Inquiry, InquiryType } from './db'
+import type { Inquiry, InquiryType } from './db';
+
+import * as v from 'valibot';
 
 const CreateIssueResponseSchema = v.object({
   number: v.number(),
-})
+});
+
+const DeviceInfoSchema = v.record(v.string(), v.unknown());
+
+function infoLine(label: string, value: unknown): string | null {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return `- ${label}: ${String(value)}`;
+  }
+  return null;
+}
 
 const TYPE_LABEL: Record<InquiryType, string> = {
   inquiry: '問い合わせ',
   feedback: 'フィードバック',
   bug: 'バグ報告',
-}
+};
 
 const LABEL_DEFINITION: Record<
   InquiryType,
   { name: string; color: string; description: string }
 > = {
   inquiry: { name: 'inquiry', color: '0075ca', description: '問い合わせ' },
-  feedback: { name: 'feedback', color: 'a2eeef', description: 'フィードバック' },
+  feedback: {
+    name: 'feedback',
+    color: 'a2eeef',
+    description: 'フィードバック',
+  },
   bug: { name: 'bug', color: 'd73a4a', description: 'バグ報告' },
-}
+};
 
 function githubHeaders(token: string): HeadersInit {
   return {
@@ -27,21 +45,21 @@ function githubHeaders(token: string): HeadersInit {
     'X-GitHub-Api-Version': '2022-11-28',
     'User-Agent': 'eqmonitor-site',
     'Content-Type': 'application/json',
-  }
+  };
 }
 
 /**
- * ラベルが repo に存在することを保証する 
+ * ラベルが repo に存在することを保証する
  * 既に存在する場合は 422 (already_exists) が返るので無視する。
  * @see https://docs.github.com/en/rest/issues/labels#create-a-label
  */
 async function ensureLabel(params: {
-  token: string
-  owner: string
-  repo: string
-  label: { name: string; color: string; description: string }
+  token: string;
+  owner: string;
+  repo: string;
+  label: { name: string; color: string; description: string };
 }): Promise<void> {
-  const { token, owner, repo, label } = params
+  const { token, owner, repo, label } = params;
   const res = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/labels`,
     {
@@ -49,10 +67,10 @@ async function ensureLabel(params: {
       headers: githubHeaders(token),
       body: JSON.stringify(label),
     },
-  )
+  );
   if (!res.ok && res.status !== 422) {
-    const text = await res.text()
-    throw new Error(`GitHub ラベル作成に失敗: ${res.status} ${text}`)
+    const text = await res.text();
+    throw new Error(`GitHub ラベル作成に失敗: ${res.status} ${text}`);
   }
 }
 
@@ -61,14 +79,14 @@ async function ensureLabel(params: {
  * @see https://docs.github.com/en/rest/issues/issues#create-an-issue
  */
 export async function createIssue(params: {
-  token: string
-  owner: string
-  repo: string
-  inquiry: Inquiry
+  token: string;
+  owner: string;
+  repo: string;
+  inquiry: Inquiry;
 }): Promise<number> {
-  const { token, owner, repo, inquiry } = params
+  const { token, owner, repo, inquiry } = params;
 
-  const title = `[${TYPE_LABEL[inquiry.type]}] ${inquiry.subject}`
+  const title = `[${TYPE_LABEL[inquiry.type]}] ${inquiry.subject}`;
   let body = [
     `## ${inquiry.subject}`,
     '',
@@ -82,23 +100,23 @@ export async function createIssue(params: {
     inquiry.app_version ? `- App version: ${inquiry.app_version}` : null,
     `- Inquiry ID: ${inquiry.id}`,
   ]
-    .filter((line) => line !== null)
-    .join('\n')
+    .filter(line => line !== null)
+    .join('\n');
 
   // Append device info as a collapsible section if present
   if (inquiry.device_info) {
-    let deviceSection: string
+    let deviceSection: string;
     try {
-      const info = JSON.parse(inquiry.device_info) as Record<string, unknown>
+      const info = v.parse(DeviceInfoSchema, JSON.parse(inquiry.device_info));
       const lines = [
         '',
         '<details>',
         '<summary>Device Info</summary>',
         '',
-        info.deviceId != null ? `- Device ID: ${info.deviceId}` : null,
-        info.appVersion != null ? `- App Version: ${info.appVersion}` : null,
-        info.buildNumber != null ? `- Build Number: ${info.buildNumber}` : null,
-        info.os != null ? `- OS: ${info.os}` : null,
+        infoLine('Device ID', info.deviceId),
+        infoLine('App Version', info.appVersion),
+        infoLine('Build Number', info.buildNumber),
+        infoLine('OS', info.os),
         '',
         '```json',
         JSON.stringify(info, null, 2),
@@ -106,9 +124,9 @@ export async function createIssue(params: {
         '',
         '</details>',
       ]
-        .filter((line) => line !== null)
-        .join('\n')
-      deviceSection = lines
+        .filter(line => line !== null)
+        .join('\n');
+      deviceSection = lines;
     } catch {
       deviceSection = [
         '',
@@ -120,14 +138,14 @@ export async function createIssue(params: {
         '```',
         '',
         '</details>',
-      ].join('\n')
+      ].join('\n');
     }
-    body += deviceSection
+    body += deviceSection;
   }
 
   // ラベルが無いと issue 作成時に 422 になるため、先に存在を保証してから付与する
-  const label = LABEL_DEFINITION[inquiry.type]
-  await ensureLabel({ token, owner, repo, label })
+  const label = LABEL_DEFINITION[inquiry.type];
+  await ensureLabel({ token, owner, repo, label });
 
   const res = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/issues`,
@@ -136,13 +154,13 @@ export async function createIssue(params: {
       headers: githubHeaders(token),
       body: JSON.stringify({ title, body, labels: [label.name] }),
     },
-  )
+  );
 
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`GitHub Issue 作成に失敗: ${res.status} ${text}`)
+    const text = await res.text();
+    throw new Error(`GitHub Issue 作成に失敗: ${res.status} ${text}`);
   }
 
-  const data = v.parse(CreateIssueResponseSchema, await res.json())
-  return data.number
+  const data = v.parse(CreateIssueResponseSchema, await res.json());
+  return data.number;
 }

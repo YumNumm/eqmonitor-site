@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Seo from '#lib/components/Seo.svelte'
-  import Hero from '#lib/components/Hero.svelte'
-  import Features from '#lib/components/Features.svelte'
+  import Features from '#lib/components/Features.svelte';
+  import Hero from '#lib/components/Hero.svelte';
+  import Seo from '#lib/components/Seo.svelte';
 </script>
 
 <Seo
