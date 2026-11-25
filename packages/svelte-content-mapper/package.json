@@ -1,0 +1,33 @@
+{
+  "name": "@eqmonitor-site/svelte-content-mapper",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./shims": {
+      "types": "./shims.d.ts"
+    }
+  },
+  "dependencies": {
+    "@jridgewell/sourcemap-codec": "^1.5.5",
+    "svelte2tsx": "^0.7.63",
+    "ts-content-mapper": "0.1.1",
+    "typescript": "~6.0.3"
+  },
+  "devDependencies": {
+    "svelte": "^5.59.1"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.1"
+  },
+  "typescript": {
+    "contentMapper": {
+      "compilerOptions": [],
+      "dynamicConfig": false,
+      "exec": [
+        "node",
+        "src/server.ts"
+      ]
+    }
+  }
+}
