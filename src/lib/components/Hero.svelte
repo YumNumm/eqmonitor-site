@@ -2,7 +2,7 @@
   import appicon from '#lib/assets/appicon.webp';
   import appstoreBadge from '#lib/assets/appstore_badge.png';
   import googlePlayBadge from '#lib/assets/google_play_badge.png';
-  import screenshot1 from '#lib/assets/screenshot_1.png';
+  import heroIphone from '#lib/assets/hero_iphone.webp';
   import { APP_STORE_URL, GOOGLE_PLAY_URL } from '#lib/links.ts';
 
   import Container from './Container.svelte';
@@ -15,8 +15,10 @@
       class="order-last mx-auto flex w-2/3 items-center p-6 md:order-first md:w-auto"
     >
       <img
-        src={screenshot1}
-        alt="screenshot 1"
+        src={heroIphone}
+        alt="EQMonitor の緊急地震速報の画面"
+        width="640"
+        height="1317"
         loading="eager"
         class="w-full drop-shadow-[0_0_25px_rgba(200,200,255,0.1)]"
       />
