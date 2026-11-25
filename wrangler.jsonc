@@ -58,6 +58,7 @@
     {
       "custom_domain": true,
       "pattern": "eqmonitor.app",
+      "previews_enabled": true,
     },
   ],
   "observability": {
