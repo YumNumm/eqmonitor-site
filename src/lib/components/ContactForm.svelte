@@ -153,14 +153,13 @@
     </label>
 
     <label class="form-control w-full">
-      <span class="label-text mb-1">お名前</span>
+      <span class="label-text mb-1">お名前(ニックネーム可)</span>
       <input
         type="text"
         class="input-bordered input w-full"
         bind:value={name}
         required
         maxlength={100}
-        placeholder="山田 太郎"
       />
     </label>
 
@@ -171,7 +170,6 @@
         class="input-bordered input w-full"
         bind:value={email}
         required
-        placeholder="you@example.com"
       />
     </label>
 
