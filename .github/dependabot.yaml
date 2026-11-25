@@ -6,12 +6,15 @@ updates:
       interval: "daily"
       timezone: "Asia/Tokyo"
       time: "09:00"
+    # パッチ更新は1つのPRにまとめ、マイナー・メジャー更新は依存ごとに個別のPRにする
     groups:
-      dependencies:
-        patterns:
-          - "*"
+      patch:
+        update-types:
+          - "patch"
     cooldown:
       default-days: 7
+
+  # pnpm のワークスペースは npm として扱われる
   - package-ecosystem: "npm"
     directories:
       - "/"
@@ -22,8 +25,8 @@ updates:
       timezone: "Asia/Tokyo"
       time: "09:00"
     groups:
-      dependencies:
-        patterns:
-          - "*"
+      patch:
+        update-types:
+          - "patch"
     cooldown:
       default-days: 7
