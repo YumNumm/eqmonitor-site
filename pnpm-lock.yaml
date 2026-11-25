@@ -256,7 +256,7 @@ importers:
         version: '@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3)'
       vite-plus:
         specifier: ^1.8.0
-        version: 1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)
+        version: 1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)
       wrangler:
         specifier: ^4.162.0
         version: 4.166.0(@types/node@22.19.19)(vitest@5.1.1)
@@ -268,7 +268,7 @@ importers:
         version: 0.5.3(hono@4.12.23)(valibot@1.4.1(typescript@6.0.3))
       '@react-email/editor':
         specifier: ^1.5.4
-        version: 1.5.10(@floating-ui/dom@1.8.0)(@tiptap/extension-list@3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1))(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(happy-dom@20.10.6)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@10.2.2)
+        version: 1.5.10(@floating-ui/dom@1.8.0)(@tiptap/extension-list@3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1))(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(happy-dom@20.14.6)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@10.2.2)
       hono:
         specifier: ^4.7.0
         version: 4.12.23
@@ -3229,8 +3229,8 @@ packages:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
     engines: {node: '>=6.0'}
 
-  happy-dom@20.10.6:
-    resolution: {integrity: sha512-6QD0ilzDDt93tX44y8tbmZdAcdTRYDhUP+Asgi6pC8Pp5IA3cvaZGyoVN/EGtlq9ziT65iPuBBn3ASLr6hCgVw==}
+  happy-dom@20.14.6:
+    resolution: {integrity: sha512-5DDsf4QmEIlRL6NkCv/fxSjYHHkZceL/IaYQdJc2h3G7DRTEai++VTjbfL0LB9geW2VrA3+vrjF3Efx+OTtX0Q==}
     engines: {node: '>=20.0.0'}
 
   has-symbols@1.1.0:
@@ -4696,7 +4696,7 @@ snapshots:
       dotenv: 16.3.1
       undici: 7.30.2
     optionalDependencies:
-      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.10.6)
+      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.14.6)
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -5580,7 +5580,7 @@ snapshots:
     dependencies:
       react: 19.2.6
 
-  '@react-email/editor@1.5.10(@floating-ui/dom@1.8.0)(@tiptap/extension-list@3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1))(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(happy-dom@20.10.6)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@10.2.2)':
+  '@react-email/editor@1.5.10(@floating-ui/dom@1.8.0)(@tiptap/extension-list@3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1))(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(happy-dom@20.14.6)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@10.2.2)':
     dependencies:
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@radix-ui/react-popover': 1.1.17(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -5606,7 +5606,7 @@ snapshots:
       '@tiptap/extension-text': 3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))
       '@tiptap/extension-underline': 3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))
       '@tiptap/extensions': 3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1)
-      '@tiptap/html': 3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1)(happy-dom@20.10.6)
+      '@tiptap/html': 3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1)(happy-dom@20.14.6)
       '@tiptap/pm': 3.27.1
       '@tiptap/react': 3.27.1(@floating-ui/dom@1.8.0)(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tiptap/starter-kit': 3.27.1
@@ -6040,11 +6040,11 @@ snapshots:
       '@tiptap/core': 3.27.1(@tiptap/pm@3.27.1)
       '@tiptap/pm': 3.27.1
 
-  '@tiptap/html@3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1)(happy-dom@20.10.6)':
+  '@tiptap/html@3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1)(happy-dom@20.14.6)':
     dependencies:
       '@tiptap/core': 3.27.1(@tiptap/pm@3.27.1)
       '@tiptap/pm': 3.27.1
-      happy-dom: 20.10.6
+      happy-dom: 20.14.6
 
   '@tiptap/pm@3.27.1':
     dependencies:
@@ -6209,7 +6209,7 @@ snapshots:
       '@testing-library/dom': 10.4.2
       '@testing-library/user-event': 14.6.13(@testing-library/dom@10.4.2)
       '@vitest/browser': 5.1.1(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(vitest@5.1.1)
-      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.10.6)
+      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.14.6)
     transitivePeerDependencies:
       - bufferutil
       - msw
@@ -6226,7 +6226,7 @@ snapshots:
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.10.6)
+      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.14.6)
       ws: 8.23.0
     transitivePeerDependencies:
       - bufferutil
@@ -6264,7 +6264,7 @@ snapshots:
       pathe: 2.0.3
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.10.6)
+      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.14.6)
 
   '@vitest/utils@5.1.1':
     dependencies:
@@ -6849,7 +6849,7 @@ snapshots:
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
 
-  happy-dom@20.10.6:
+  happy-dom@20.14.6:
     dependencies:
       '@types/node': 22.19.19
       '@types/whatwg-mimetype': 3.0.2
@@ -7533,7 +7533,7 @@ snapshots:
 
   orderedmap@2.1.1: {}
 
-  oxfmt@0.79.0(svelte@5.59.1)(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)):
+  oxfmt@0.79.0(svelte@5.59.1)(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)):
     dependencies:
       tinypool: 2.2.0
     optionalDependencies:
@@ -7557,9 +7557,9 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.79.0
       '@oxfmt/binding-win32-x64-msvc': 0.79.0
       svelte: 5.59.1
-      vite-plus: 1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)
+      vite-plus: 1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)
 
-  oxlint@1.94.0(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)):
+  oxlint@1.94.0(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)):
     optionalDependencies:
       '@oxlint/binding-android-arm-eabi': 1.94.0
       '@oxlint/binding-android-arm64': 1.94.0
@@ -7580,7 +7580,7 @@ snapshots:
       '@oxlint/binding-win32-arm64-msvc': 1.94.0
       '@oxlint/binding-win32-ia32-msvc': 1.94.0
       '@oxlint/binding-win32-x64-msvc': 1.94.0
-      vite-plus: 1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)
+      vite-plus: 1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3)
 
   pako@0.2.9: {}
 
@@ -8253,7 +8253,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3):
+  vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3):
     dependencies:
       '@oxc-project/runtime': 0.159.0
       '@oxc-project/types': 0.159.0
@@ -8265,11 +8265,11 @@ snapshots:
       '@vitest/snapshot': 5.1.1
       '@vitest/spy': 5.1.1
       '@vitest/utils': 5.1.1
-      oxfmt: 0.79.0(svelte@5.59.1)(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3))
-      oxlint: 1.94.0(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3))
+      oxfmt: 0.79.0(svelte@5.59.1)(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3))
+      oxlint: 1.94.0(vite-plus@1.8.0(@types/node@22.19.19)(@vitest/ui@5.1.1)(esbuild@0.28.1)(happy-dom@20.14.6)(jiti@2.7.0)(svelte@5.59.1)(tsx@4.22.4)(typescript@6.0.3))
       tsrs: 7.1.0-beta.tsrs4
       vite: '@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3)'
-      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.10.6)
+      vitest: 5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.14.6)
     optionalDependencies:
       '@voidzero-dev/vite-plus-darwin-arm64': 1.8.0
       '@voidzero-dev/vite-plus-darwin-x64': 1.8.0
@@ -8319,7 +8319,7 @@ snapshots:
     optionalDependencies:
       vite: '@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3)'
 
-  vitest@5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.10.6):
+  vitest@5.1.1(@types/node@22.19.19)(@vitest/browser-preview@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(happy-dom@20.14.6):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/mocker': 5.1.1(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))
@@ -8339,7 +8339,7 @@ snapshots:
       '@types/node': 22.19.19
       '@vitest/browser-preview': 5.1.1(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@22.19.19)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(vitest@5.1.1)
       '@vitest/ui': 5.1.1(vitest@5.1.1)
-      happy-dom: 20.10.6
+      happy-dom: 20.14.6
     transitivePeerDependencies:
       - msw
 
