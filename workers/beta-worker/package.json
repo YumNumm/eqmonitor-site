@@ -20,7 +20,7 @@
     "@react-email/editor": "^1.5.4",
     "hono": "^4.7.0",
     "jose": "^6.0.0",
-    "valibot": "^1.1.0"
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
     "@react-email/components": "^1.0.12",
