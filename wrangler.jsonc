@@ -22,6 +22,25 @@
       "id": "37b58cde00df461ba8a2baa69fd6b78d",
     },
   ],
+  "previews": {
+    "vars": {
+      "TURNSTILE_SITE_KEY": "0x4AAAAAADXHIKnSew1W7HAw",
+      "GITHUB_OWNER": "YumNumm",
+      "GITHUB_REPO": "eqmonitor-backend",
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_id": "d98dba26-a8c3-4f4a-8b89-66ffc07c1901",
+      },
+    ],
+    "kv_namespaces": [
+      {
+        "binding": "PROJECTS_KV",
+        "id": "37b58cde00df461ba8a2baa69fd6b78d",
+      },
+    ],
+  },
   "services": [
     {
       "binding": "BETA_WORKER",
