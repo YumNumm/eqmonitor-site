@@ -1,20 +1,14 @@
-import { defineConfig } from 'vite'
-import { cloudflare } from '@cloudflare/vite-plugin'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
+import { sveltekit } from '@sveltejs/kit/vite'
 import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite-plus'
+import { adapter } from './adapter'
 
 export default defineConfig({
   server: {
     port: 3000,
   },
-  resolve: {
-    tsconfigPaths: true,
+  plugins: [tailwindcss(), sveltekit({ adapter: adapter() })],
+  lint: {
+    ignorePatterns: ['.svelte-kit/**', 'workers/**', 'worker-configuration.d.ts'],
   },
-  plugins: [
-    tailwindcss(),
-    cloudflare({ viteEnvironment: { name: 'ssr' } }),
-    tanstackStart(),
-    viteReact(),
-  ],
 })

@@ -1,33 +1,31 @@
 {
   "name": "eqmonitor-site",
   "private": true,
-  "sideEffects": false,
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@12.14.0",
+  "imports": {
+    "#lib": "./src/lib",
+    "#lib/*": "./src/lib/*"
+  },
   "scripts": {
+    "dev": "portless eqmonitor-site vp dev .",
+    "build": "vp build .",
+    "preview": "portless eqmonitor-site vp preview .",
+    "prepare": "svelte-kit sync || true",
+    "check": "wrangler types && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:well-known": "node scripts/check-well-known.mjs",
-    "dev": "portless eqmonitor-site pnpm vite dev",
-    "build": "vite build",
-    "preview": "portless eqmonitor-site vite preview",
-    "deploy": "pnpm run build && wrangler deploy",
+    "lint": "vp lint",
+    "deploy": "vp build . && wrangler deploy",
     "cf-typegen": "wrangler types",
     "db:migrate:local": "wrangler d1 migrations apply eqmonitor-site-inquiries --local",
     "db:migrate:remote": "wrangler d1 migrations apply eqmonitor-site-inquiries --remote"
   },
   "dependencies": {
-    "@heroicons/react": "^2.2.0",
     "@shikijs/rehype": "^4.3.0",
-    "@tanstack/react-query": "^5.101.0",
-    "@tanstack/react-router": "^1.170.8",
-    "@tanstack/react-router-devtools": "^1.167.0",
-    "@tanstack/react-start": "^1.168.14",
-    "eqmonitor-beta-worker": "workspace:*",
+    "bits-ui": "^2.22.0",
     "gray-matter": "^4.0.3",
-    "hono": "^4.12.23",
-    "jose": "^6.2.3",
     "marked": "^16.4.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
@@ -37,18 +35,20 @@
     "valibot": "^1.1.0"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.39.0",
+    "@sveltejs/adapter-cloudflare": "^9.0.0",
+    "@sveltejs/kit": "^3.4.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^22.5.4",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
-    "@vitejs/plugin-react": "^6.0.1",
     "daisyui": "^5.5.19",
     "portless": "^0.13.1",
+    "svelte": "^5.59.0",
+    "svelte-check": "^4.7.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14",
-    "wrangler": "^4.95.0"
+    "vite": "npm:@voidzero-dev/vite-plus-core@8.3.8001",
+    "vite-plus": "^1.8.0",
+    "wrangler": "^4.162.0"
   }
 }

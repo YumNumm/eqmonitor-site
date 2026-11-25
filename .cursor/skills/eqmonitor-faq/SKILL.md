@@ -1,6 +1,6 @@
 ---
 name: eqmonitor-faq
-description: EQMonitor サイトの FAQ コンテンツを追加・編集する。src/content/faq/ 配下のMarkdownファイルを操作するとき、よくある質問ページのセクションや項目を追加・変更・削除するときに使う。
+description: EQMonitor サイトの FAQ コンテンツを追加・編集する。src/lib/content/faq/ 配下のMarkdownファイルを操作するとき、よくある質問ページのセクションや項目を追加・変更・削除するときに使う。
 ---
 
 # EQMonitor FAQ コンテンツ管理
@@ -8,7 +8,7 @@ description: EQMonitor サイトの FAQ コンテンツを追加・編集する�
 ## ファイル構成
 
 ```
-src/content/faq/
+src/lib/content/faq/
   {section-id}/
     _index.md       ← セクション定義（必須）
     {item-id}.md    ← Q&A 1件
@@ -59,9 +59,9 @@ order: 1
 
 | ファイル | 役割 |
 |---|---|
-| `src/lib/faq.ts` | `import.meta.glob` でファイル読み込み・レンダリング |
-| `src/routes/faq.tsx` | ページコンポーネント・ハッシュリンク制御 |
-| `src/content/faq/` | コンテンツ（Markdownファイル） |
+| `src/lib/server/faq.ts` | `import.meta.glob` でファイル読み込み・レンダリング |
+| `src/routes/faq/+page.svelte` / `src/lib/hashCollapse.ts` | ページコンポーネント・ハッシュリンク制御 |
+| `src/lib/content/faq/` | コンテンツ（Markdownファイル） |
 
 コンテンツ追加時はこのディレクトリのみ編集すればよい。
 
