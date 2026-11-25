@@ -1,8 +1,9 @@
-import { getAllPosts } from '#lib/server/blog.ts'
-import type { PageServerLoad } from './$types'
+import type { PageServerLoad } from './$types';
 
-export const prerender = true
+import { getAllPosts } from '#lib/server/blog.ts';
+
+export const prerender = true;
 
 export const load: PageServerLoad = () => {
-  return { posts: getAllPosts() }
-}
+  return { posts: getAllPosts() };
+};

@@ -1,0 +1,57 @@
+name: Actions Check
+
+on:
+  pull_request:
+    paths:
+      - '.github/**'
+      - 'mise.toml'
+      - 'mise.lock'
+  push:
+    branches: [main]
+    paths:
+      - '.github/**'
+      - 'mise.toml'
+      - 'mise.lock'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: actions-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Actions Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    env:
+      MISE_NO_HOOKS: '1'
+      MISE_AUTO_INSTALL: 'false'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install workflow linters
+        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        with:
+          install_args: --locked actionlint ghalint pinact zizmor
+
+      - name: Add actionlint problem matcher
+        run: echo '::add-matcher::.github/problem_matcher/actionlint.json'
+
+      - name: Run actionlint
+        run: actionlint -color
+
+      - name: Check workflow policies
+        run: ghalint run
+
+      - name: Check action pins
+        run: pinact run --fix=false --no-api
+
+      - name: Audit workflows
+        run: zizmor --offline .github/workflows

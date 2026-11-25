@@ -1,9 +1,8 @@
 {
   "name": "eqmonitor-site",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "version": "0.0.1",
-  "packageManager": "pnpm@12.14.0",
   "imports": {
     "#lib": "./src/lib",
     "#lib/*": "./src/lib/*"
@@ -16,6 +15,7 @@
     "check": "wrangler types && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:well-known": "node scripts/check-well-known.mjs",
     "lint": "vp lint",
+    "format": "vp fmt",
     "deploy": "vp build . && wrangler deploy",
     "cf-typegen": "wrangler types",
     "db:migrate:local": "wrangler d1 migrations apply eqmonitor-site-inquiries --local",
@@ -50,5 +50,6 @@
     "vite": "npm:@voidzero-dev/vite-plus-core@8.3.8001",
     "vite-plus": "^1.8.0",
     "wrangler": "^4.162.0"
-  }
+  },
+  "packageManager": "pnpm@12.22.0"
 }

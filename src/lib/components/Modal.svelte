@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { Dialog } from 'bits-ui'
-  import type { Snippet } from 'svelte'
+  import type { Snippet } from 'svelte';
+
+  import { Dialog } from 'bits-ui';
 
   let {
     open = $bindable(false),
@@ -9,19 +10,19 @@
     children,
     actions,
   }: {
-    open?: boolean
-    title: string
-    class?: string
-    children: Snippet
-    actions: Snippet
-  } = $props()
+    open?: boolean;
+    title: string;
+    class?: string;
+    children: Snippet;
+    actions: Snippet;
+  } = $props();
 </script>
 
 <Dialog.Root bind:open>
   <Dialog.Portal>
-    <div class="modal modal-open">
+    <div class="modal-open modal">
       <Dialog.Content class="modal-box {className}">
-        <Dialog.Title class="text-lg font-bold mb-4">{title}</Dialog.Title>
+        <Dialog.Title class="mb-4 text-lg font-bold">{title}</Dialog.Title>
         {@render children()}
         <div class="modal-action">
           {@render actions()}

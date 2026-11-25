@@ -1,11 +1,11 @@
-import { unified } from 'unified'
-import remarkParse from 'remark-parse'
-import remarkGfm from 'remark-gfm'
-import remarkRehype from 'remark-rehype'
-import rehypeShikiFromHighlighter from '@shikijs/rehype/core'
-import rehypeStringify from 'rehype-stringify'
-import { createHighlighterCore } from 'shiki/core'
-import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
+import rehypeShikiFromHighlighter from '@shikijs/rehype/core';
+import rehypeStringify from 'rehype-stringify';
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import { createHighlighterCore } from 'shiki/core';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import { unified } from 'unified';
 
 const highlighterPromise = createHighlighterCore({
   themes: [import('shiki/themes/github-dark.mjs')],
@@ -27,17 +27,17 @@ const highlighterPromise = createHighlighterCore({
     import('shiki/langs/toml.mjs'),
   ],
   engine: createJavaScriptRegexEngine(),
-})
+});
 
 export async function renderMarkdown(markdown: string): Promise<string> {
-  const highlighter = await highlighterPromise
+  const highlighter = await highlighterPromise;
   const result = await unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeShikiFromHighlighter, highlighter, { theme: 'github-dark' })
     .use(rehypeStringify)
-    .process(markdown)
+    .process(markdown);
 
-  return String(result)
+  return String(result);
 }

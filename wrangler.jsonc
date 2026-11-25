@@ -1,55 +1,53 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "eqmonitor-site",
-	"compatibility_date": "2025-09-24",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"vars": {
-		"TURNSTILE_SITE_KEY": "0x4AAAAAADXHIKnSew1W7HAw",
-		"GITHUB_OWNER": "YumNumm",
-		"GITHUB_REPO": "eqmonitor-backend"
-	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "eqmonitor-site-inquiries",
-			"migrations_dir": "migrations",
-			"database_id": "d98dba26-a8c3-4f4a-8b89-66ffc07c1901"
-		}
-	],
-	"kv_namespaces": [
-		{
-			"binding": "PROJECTS_KV",
-			"id": "37b58cde00df461ba8a2baa69fd6b78d"
-		}
-	],
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eqmonitor-site",
+  "compatibility_date": "2025-09-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "TURNSTILE_SITE_KEY": "0x4AAAAAADXHIKnSew1W7HAw",
+    "GITHUB_OWNER": "YumNumm",
+    "GITHUB_REPO": "eqmonitor-backend",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "eqmonitor-site-inquiries",
+      "migrations_dir": "migrations",
+      "database_id": "d98dba26-a8c3-4f4a-8b89-66ffc07c1901",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "PROJECTS_KV",
+      "id": "37b58cde00df461ba8a2baa69fd6b78d",
+    },
+  ],
   "services": [
     {
       "binding": "BETA_WORKER",
-      "service": "eqmonitor-beta-worker"
+      "service": "eqmonitor-beta-worker",
     },
     {
       "binding": "OG_WORKER",
-      "service": "eqmonitor-og-worker"
-    }
+      "service": "eqmonitor-og-worker",
+    },
   ],
-	"triggers": {
-		"crons": ["* * * * *"]
-	},
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
   "routes": [
     {
       "custom_domain": true,
-      "pattern": "eqmonitor.app"
-    }
+      "pattern": "eqmonitor.app",
+    },
   ],
   "observability": {
     "logs": {
       "enabled": true,
-      "invocation_logs": true
+      "invocation_logs": true,
     },
     "traces": {
       "enabled": false,
-    }
-  }
+    },
+  },
 }

@@ -1,15 +1,15 @@
-import { generateASCJwt } from './asc-jwt'
+import { generateASCJwt } from './asc-jwt';
 
-const ASC_BASE = 'https://api.appstoreconnect.apple.com/v1'
+const ASC_BASE = 'https://api.appstoreconnect.apple.com/v1';
 
 interface ASCEnv {
-  APP_STORE_CONNECT_KEY_ID: string
-  APP_STORE_CONNECT_ISSUER_ID: string
-  APP_STORE_CONNECT_PRIVATE_KEY: string
+  APP_STORE_CONNECT_KEY_ID: string;
+  APP_STORE_CONNECT_ISSUER_ID: string;
+  APP_STORE_CONNECT_PRIVATE_KEY: string;
 }
 
 export interface AddTesterResult {
-  testerId: string
+  testerId: string;
 }
 
 async function ascFetch(
@@ -21,7 +21,7 @@ async function ascFetch(
     env.APP_STORE_CONNECT_KEY_ID,
     env.APP_STORE_CONNECT_ISSUER_ID,
     env.APP_STORE_CONNECT_PRIVATE_KEY,
-  )
+  );
 
   return fetch(`${ASC_BASE}${path}`, {
     ...init,
@@ -30,16 +30,16 @@ async function ascFetch(
       'Content-Type': 'application/json',
       ...init?.headers,
     },
-  })
+  });
 }
 
 export async function addBetaTester(
   env: ASCEnv,
   params: {
-    email: string
-    firstName?: string
-    lastName?: string
-    betaGroupId: string
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    betaGroupId: string;
   },
 ): Promise<AddTesterResult> {
   const body = {
@@ -56,20 +56,20 @@ export async function addBetaTester(
         },
       },
     },
-  }
+  };
 
   const res = await ascFetch(env, '/betaTesters', {
     method: 'POST',
     body: JSON.stringify(body),
-  })
+  });
 
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`App Store Connect API error (${res.status}): ${text}`)
+    const text = await res.text();
+    throw new Error(`App Store Connect API error (${res.status}): ${text}`);
   }
 
-  const json = (await res.json()) as { data: { id: string } }
-  return { testerId: json.data.id }
+  const json = (await res.json()) as { data: { id: string } };
+  return { testerId: json.data.id };
 }
 
 /**
@@ -83,22 +83,20 @@ export async function getBetaGroupAppId(
   const res = await ascFetch(
     env,
     `/betaGroups/${betaGroupId}/relationships/app`,
-  )
+  );
 
   if (!res.ok) {
-    const text = await res.text()
+    const text = await res.text();
     throw new Error(
       `App Store Connect API error (${res.status}) while resolving app for beta group: ${text}`,
-    )
+    );
   }
 
-  const json = (await res.json()) as { data: { id: string } | null }
+  const json = (await res.json()) as { data: { id: string } | null };
   if (!json.data?.id) {
-    throw new Error(
-      `Beta group ${betaGroupId} is not associated with an app`,
-    )
+    throw new Error(`Beta group ${betaGroupId} is not associated with an app`);
   }
-  return json.data.id
+  return json.data.id;
 }
 
 /**
@@ -108,8 +106,8 @@ export async function getBetaGroupAppId(
 export async function sendBetaTesterInvitation(
   env: ASCEnv,
   params: {
-    appId: string
-    testerId: string
+    appId: string;
+    testerId: string;
   },
 ): Promise<void> {
   const body = {
@@ -124,17 +122,17 @@ export async function sendBetaTesterInvitation(
         },
       },
     },
-  }
+  };
 
   const res = await ascFetch(env, '/betaTesterInvitations', {
     method: 'POST',
     body: JSON.stringify(body),
-  })
+  });
 
   if (!res.ok) {
-    const text = await res.text()
+    const text = await res.text();
     throw new Error(
       `App Store Connect API error (${res.status}) while sending invitation: ${text}`,
-    )
+    );
   }
 }

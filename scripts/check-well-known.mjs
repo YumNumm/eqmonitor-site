@@ -10,18 +10,21 @@ const fingerprints = [
 const wellKnownDirectory = new URL('../static/.well-known/', import.meta.url);
 
 const [aasaSource, assetLinksSource, headersSource] = await Promise.all([
-  readFile(new URL('apple-app-site-association', wellKnownDirectory), 'utf8'),
-  readFile(new URL('assetlinks.json', wellKnownDirectory), 'utf8'),
-  readFile(new URL('../_headers', import.meta.url), 'utf8'),
+  readFile(new URL('apple-app-site-association', wellKnownDirectory), 'utf-8'),
+  readFile(new URL('assetlinks.json', wellKnownDirectory), 'utf-8'),
+  readFile(new URL('../_headers', import.meta.url), 'utf-8'),
 ]);
 const aasa = JSON.parse(aasaSource);
 const assetLinks = JSON.parse(assetLinksSource);
 
 assert.ok(aasa.applinks, 'AASA must retain applinks');
-assert.ok(Array.isArray(aasa.applinks.details), 'AASA applinks must retain details');
+assert.ok(
+  Array.isArray(aasa.applinks.details),
+  'AASA applinks must retain details',
+);
 assert.ok(
   aasa.applinks.details.some(
-    (detail) =>
+    detail =>
       Array.isArray(detail.appIDs) &&
       detail.appIDs.includes(appId) &&
       Array.isArray(detail.paths) &&
@@ -29,7 +32,10 @@ assert.ok(
   ),
   `AASA applinks must retain the wildcard route for ${appId}`,
 );
-assert.ok(Array.isArray(aasa.webcredentials?.apps), 'AASA must define webcredentials.apps');
+assert.ok(
+  Array.isArray(aasa.webcredentials?.apps),
+  'AASA must define webcredentials.apps',
+);
 assert.ok(
   aasa.webcredentials.apps.includes(appId),
   `AASA webcredentials.apps must contain ${appId}`,
@@ -37,15 +43,22 @@ assert.ok(
 
 assert.ok(Array.isArray(assetLinks), 'Digital Asset Links must be an array');
 const androidAppAssociation = assetLinks.find(
-  (association) => association.target?.package_name === packageName,
+  association => association.target?.package_name === packageName,
 );
-assert.ok(androidAppAssociation, `Digital Asset Links must contain ${packageName}`);
 assert.ok(
-  androidAppAssociation.relation.includes('delegate_permission/common.handle_all_urls'),
+  androidAppAssociation,
+  `Digital Asset Links must contain ${packageName}`,
+);
+assert.ok(
+  androidAppAssociation.relation.includes(
+    'delegate_permission/common.handle_all_urls',
+  ),
   'Digital Asset Links must retain handle_all_urls',
 );
 assert.ok(
-  androidAppAssociation.relation.includes('delegate_permission/common.get_login_creds'),
+  androidAppAssociation.relation.includes(
+    'delegate_permission/common.get_login_creds',
+  ),
   'Digital Asset Links must include get_login_creds',
 );
 for (const fingerprint of fingerprints) {

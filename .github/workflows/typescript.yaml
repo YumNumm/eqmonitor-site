@@ -1,0 +1,133 @@
+name: TypeScript Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: typescript-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  MISE_NO_HOOKS: '1'
+  MISE_AUTO_INSTALL: 'false'
+
+jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js and pnpm
+        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        with:
+          install_args: --locked node pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # 自動修正はしない。違反があれば `pnpm exec vp fmt` の結果を commit する
+      - name: Check format
+        run: pnpm exec vp fmt --check
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js and pnpm
+        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        with:
+          install_args: --locked node pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm check
+
+      - name: Verify well-known files
+        run: pnpm check:well-known
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js and pnpm
+        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        with:
+          install_args: --locked node pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 型情報を使うルールは、生成される型定義（wrangler types・svelte-kit sync）を参照する
+      - name: Generate types
+        run: pnpm exec wrangler types && pnpm exec svelte-kit sync
+
+      - name: Lint
+        run: pnpm exec vp lint --format=github
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js and pnpm
+        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        with:
+          install_args: --locked node pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+  status-check:
+    name: TypeScript Status Check
+    needs: [format, analyze, lint, build]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    permissions: {}
+    steps:
+      - name: Verify all checks passed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS"
+          jq -e 'to_entries | all(.value.result == "success")' <<< "$RESULTS"

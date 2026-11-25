@@ -1,63 +1,67 @@
-import { Hono } from 'hono'
-import { initWasm, Resvg } from '@resvg/resvg-wasm'
-import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm'
-import satori from 'satori'
-import appiconPng from './appicon.png'
-import googleSansFlexBold from './fonts/GoogleSansFlex-Bold.ttf'
-import notoSansJPBold from './fonts/NotoSansJP-Bold.ttf'
+import { initWasm, Resvg } from '@resvg/resvg-wasm';
+import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
+import { Hono } from 'hono';
+import satori from 'satori';
 
-let wasmReady: Promise<void> | null = null
+import appiconPng from './appicon.png';
+import googleSansFlexBold from './fonts/GoogleSansFlex-Bold.ttf';
+import notoSansJPBold from './fonts/NotoSansJP-Bold.ttf';
+
+let wasmReady: Promise<void> | null = null;
 function ensureWasm() {
-  if (!wasmReady) wasmReady = initWasm(resvgWasm as WebAssembly.Module)
-  return wasmReady
+  if (!wasmReady) wasmReady = initWasm(resvgWasm as WebAssembly.Module);
+  return wasmReady;
 }
 
 function bufferToDataUrl(buf: ArrayBuffer, mime: string): string {
-  const bytes = new Uint8Array(buf)
-  const chunks: string[] = []
+  const bytes = new Uint8Array(buf);
+  const chunks: string[] = [];
   for (let i = 0; i < bytes.length; i += 8192) {
-    chunks.push(String.fromCharCode(...bytes.subarray(i, i + 8192)))
+    chunks.push(String.fromCodePoint(...bytes.subarray(i, i + 8192)));
   }
-  return `data:${mime};base64,${btoa(chunks.join(''))}`
+  return `data:${mime};base64,${btoa(chunks.join(''))}`;
 }
 
-const APPICON_DATA_URL = bufferToDataUrl(appiconPng as ArrayBuffer, 'image/png')
+const APPICON_DATA_URL = bufferToDataUrl(
+  appiconPng as ArrayBuffer,
+  'image/png',
+);
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 async function fetchImageAsDataUrl(url: string): Promise<string | null> {
   try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 5000)
-    const res = await fetch(url, { signal: controller.signal })
-    clearTimeout(timeout)
-    if (!res.ok) return null
-    const buf = await res.arrayBuffer()
-    if (buf.byteLength > MAX_IMAGE_BYTES) return null
-    const type = res.headers.get('Content-Type') || 'image/png'
-    return bufferToDataUrl(buf, type)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength > MAX_IMAGE_BYTES) return null;
+    const type = res.headers.get('Content-Type') || 'image/png';
+    return bufferToDataUrl(buf, type);
   } catch {
-    return null
+    return null;
   }
 }
 
 function titleFontSize(len: number, hasImage: boolean): number {
   if (hasImage) {
-    if (len > 40) return 36
-    if (len > 25) return 42
-    return 48
+    if (len > 40) return 36;
+    if (len > 25) return 42;
+    return 48;
   }
-  if (len > 60) return 40
-  if (len > 40) return 48
-  if (len > 25) return 56
-  return 64
+  if (len > 60) return 40;
+  if (len > 40) return 48;
+  if (len > 25) return 56;
+  return 64;
 }
 
 const TYPE_LABEL: Record<string, string> = {
   blog: 'BLOG',
   projects: 'PROJECTS',
   beta: 'BETA',
-}
+};
 
 function LabelChip({ label }: { label: string }) {
   return (
@@ -78,26 +82,26 @@ function LabelChip({ label }: { label: string }) {
     >
       {label}
     </div>
-  )
+  );
 }
 
-const app = new Hono()
+const app = new Hono();
 
-app.get('/', async (c) => {
-  const title = c.req.query('title')
-  if (!title) return c.text('title query parameter is required', 400)
+app.get('/', async c => {
+  const title = c.req.query('title');
+  if (!title) return c.text('title query parameter is required', 400);
   if (title.length > 200)
-    return c.text('title must be 200 characters or fewer', 400)
+    return c.text('title must be 200 characters or fewer', 400);
 
-  const typeParam = c.req.query('type')
-  const label = typeParam ? TYPE_LABEL[typeParam] : undefined
+  const typeParam = c.req.query('type');
+  const label = typeParam ? TYPE_LABEL[typeParam] : undefined;
 
-  const imageUrl = c.req.query('image')
+  const imageUrl = c.req.query('image');
   const [imageData] = await Promise.all([
     imageUrl ? fetchImageAsDataUrl(imageUrl) : null,
     ensureWasm(),
-  ])
-  const hasImage = !!imageData
+  ]);
+  const hasImage = Boolean(imageData);
 
   const svg = await satori(
     <div
@@ -198,7 +202,7 @@ app.get('/', async (c) => {
                 />
                 <img
                   src={APPICON_DATA_URL}
-                  alt=""
+                  alt=''
                   width={80}
                   height={80}
                   style={{
@@ -253,7 +257,7 @@ app.get('/', async (c) => {
               </div>
               <img
                 src={imageData ?? ''}
-                alt=""
+                alt=''
                 width={320}
                 height={320}
                 style={{
@@ -301,7 +305,7 @@ app.get('/', async (c) => {
               />
               <img
                 src={APPICON_DATA_URL}
-                alt=""
+                alt=''
                 width={168}
                 height={168}
                 style={{
@@ -372,20 +376,20 @@ app.get('/', async (c) => {
         },
       ],
     },
-  )
+  );
 
   const resvg = new Resvg(svg, {
     fitTo: { mode: 'width', value: 1200 },
-  })
-  const pngData = resvg.render()
-  const pngBuffer = pngData.asPng()
+  });
+  const pngData = resvg.render();
+  const pngBuffer = pngData.asPng();
 
   return new Response(pngBuffer as unknown as BodyInit, {
     headers: {
       'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=31536000, immutable',
     },
-  })
-})
+  });
+});
 
-export default app
+export default app;

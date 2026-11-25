@@ -3,7 +3,7 @@
     title,
     description,
     image,
-  }: { title: string; description?: string; image?: string } = $props()
+  }: { title: string; description?: string; image?: string } = $props();
 </script>
 
 <svelte:head>

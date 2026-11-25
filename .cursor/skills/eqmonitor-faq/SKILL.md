@@ -57,11 +57,11 @@ order: 1
 
 ## 実装の場所
 
-| ファイル | 役割 |
-|---|---|
-| `src/lib/server/faq.ts` | `import.meta.glob` でファイル読み込み・レンダリング |
-| `src/routes/faq/+page.svelte` / `src/lib/hashCollapse.ts` | ページコンポーネント・ハッシュリンク制御 |
-| `src/lib/content/faq/` | コンテンツ（Markdownファイル） |
+| ファイル                                                  | 役割                                                |
+| --------------------------------------------------------- | --------------------------------------------------- |
+| `src/lib/server/faq.ts`                                   | `import.meta.glob` でファイル読み込み・レンダリング |
+| `src/routes/faq/+page.svelte` / `src/lib/hashCollapse.ts` | ページコンポーネント・ハッシュリンク制御            |
+| `src/lib/content/faq/`                                    | コンテンツ（Markdownファイル）                      |
 
 コンテンツ追加時はこのディレクトリのみ編集すればよい。
 
