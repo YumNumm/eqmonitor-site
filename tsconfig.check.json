@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "contentMappers": [
+    {
+      "package": "@eqmonitor-site/svelte-content-mapper",
+      "extensions": [".svelte"]
+    }
+  ],
+  "compilerOptions": {
+    "types": [
+      "$app/types",
+      "node",
+      "@eqmonitor-site/svelte-content-mapper/shims"
+    ]
+  }
+}

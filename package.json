@@ -12,7 +12,7 @@
     "build": "vp build .",
     "preview": "portless eqmonitor-site vp preview .",
     "prepare": "svelte-kit sync || true",
-    "check": "wrangler types && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check": "wrangler types && svelte-kit sync && node node_modules/typescript7/bin/tsc -p tsconfig.check.json --runExternalCode",
     "check:well-known": "node scripts/check-well-known.mjs",
     "lint": "vp lint",
     "format": "vp fmt",
@@ -35,6 +35,7 @@
     "valibot": "^1.1.0"
   },
   "devDependencies": {
+    "@eqmonitor-site/svelte-content-mapper": "workspace:*",
     "@sveltejs/adapter-cloudflare": "^9.0.0",
     "@sveltejs/kit": "^3.4.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.0",
@@ -44,9 +45,9 @@
     "daisyui": "^5.5.19",
     "portless": "^0.13.1",
     "svelte": "^5.59.0",
-    "svelte-check": "^4.7.0",
     "tailwindcss": "^4.3.0",
-    "typescript": "^6.0.3",
+    "typescript": "~6.0.3",
+    "typescript7": "npm:typescript@7.1.0-beta",
     "vite": "npm:@voidzero-dev/vite-plus-core@8.3.8001",
     "vite-plus": "^1.8.0",
     "wrangler": "^4.162.0"
