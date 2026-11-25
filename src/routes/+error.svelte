@@ -16,18 +16,6 @@
     <p class="text-base-content/70">
       お探しのページは存在しないか、移動した可能性があります。
     </p>
-    <iframe
-      data-testid="embed-iframe"
-      style="border-radius: 12px"
-      src="https://open.spotify.com/embed/track/3KA1V97fnMUNmMGHywtBIj?utm_source=generator&theme=0&si=d98f953e64514d26"
-      width="100%"
-      height="352"
-      frameborder="0"
-      allowfullscreen
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      loading="lazy"
-      title="Error 404"
-    ></iframe>
     <a href="/" class="btn btn-primary">トップへ戻る</a>
   </div>
 {:else}
