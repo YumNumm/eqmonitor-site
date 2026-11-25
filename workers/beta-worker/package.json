@@ -18,7 +18,7 @@
   "dependencies": {
     "@hono/valibot-validator": "^0.5.0",
     "@react-email/editor": "^1.5.4",
-    "hono": "^4.7.0",
+    "hono": "^4.13.16",
     "jose": "^6.0.0",
     "valibot": "^1.1.0"
   },
