@@ -42,12 +42,24 @@
     },
   ],
   "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "redact_query_string": false,
     "logs": {
       "enabled": true,
+      "head_sampling_rate": 1,
       "invocation_logs": true,
+      "destinations": ["home8s-logs"],
+      "persist": false,
     },
     "traces": {
-      "enabled": false,
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "destinations": ["home8s-traces"],
+      "persist": false,
+    },
+    "issues": {
+      "enabled": true,
     },
   },
 }
