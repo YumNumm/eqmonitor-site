@@ -58,8 +58,8 @@ local linters = new Mapping<String, Step> {
     }
     ["vp-fmt"] {
         glob = webGlobs
-        check = "mise exec -- pnpm exec vp fmt --check {{files}}"
-        fix = "mise exec -- pnpm exec vp fmt {{files}}"
+        check = "mise exec -- pnpm exec vp fmt --check --no-error-on-unmatched-pattern {{files}}"
+        fix = "mise exec -- pnpm exec vp fmt --no-error-on-unmatched-pattern {{files}}"
     }
     ["vp-lint"] {
         glob = lintGlobs
