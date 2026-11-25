@@ -287,13 +287,13 @@ importers:
     dependencies:
       '@hono/valibot-validator':
         specifier: ^0.5.0
-        version: 0.5.3(hono@4.12.23)(valibot@1.4.1(typescript@6.0.3))
+        version: 0.5.3(hono@4.13.16)(valibot@1.4.1(typescript@6.0.3))
       '@react-email/editor':
         specifier: ^1.5.4
         version: 1.5.10(@floating-ui/dom@1.8.0)(@tiptap/extension-list@3.27.1(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1))(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(happy-dom@20.10.6)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@10.2.2)
       hono:
-        specifier: ^4.7.0
-        version: 4.12.23
+        specifier: ^4.13.16
+        version: 4.13.16
       jose:
         specifier: ^6.0.0
         version: 6.2.3
@@ -329,8 +329,8 @@ importers:
         specifier: ^2.6.0
         version: 2.6.2
       hono:
-        specifier: ^4.7.0
-        version: 4.12.23
+        specifier: ^4.13.16
+        version: 4.13.16
       satori:
         specifier: ^0.12.0
         version: 0.12.2
@@ -3419,8 +3419,8 @@ packages:
     resolution: {integrity: sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==}
     engines: {node: '>=6'}
 
-  hono@4.12.23:
-    resolution: {integrity: sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA==}
+  hono@4.13.16:
+    resolution: {integrity: sha512-AOLOEhvrV+iH92xXCnFr/5+3KjPKcI3xP63XJtX5spAnkznPdHijlIsUTpi7/9EhWqrTCekw5c5zh1K+YsVw7A==}
     engines: {node: '>=16.9.0'}
 
   html-to-text@9.0.5:
@@ -5131,9 +5131,9 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@hono/valibot-validator@0.5.3(hono@4.12.23)(valibot@1.4.1(typescript@6.0.3))':
+  '@hono/valibot-validator@0.5.3(hono@4.13.16)(valibot@1.4.1(typescript@6.0.3))':
     dependencies:
-      hono: 4.12.23
+      hono: 4.13.16
       valibot: 1.4.1(typescript@6.0.3)
 
   '@img/colour@1.1.0': {}
@@ -7146,7 +7146,7 @@ snapshots:
 
   hex-rgb@4.3.0: {}
 
-  hono@4.12.23: {}
+  hono@4.13.16: {}
 
   html-to-text@9.0.5:
     dependencies:
